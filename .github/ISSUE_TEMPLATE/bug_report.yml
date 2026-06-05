@@ -1,0 +1,62 @@
+name: Rapport de bug
+description: Signaler un probleme reproductible dans Accessible.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de fournir les informations utiles sans joindre de donnees personnelles sensibles.
+  - type: input
+    id: version
+    attributes:
+      label: Version d'Accessible
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: system
+    attributes:
+      label: Systeme
+      options:
+        - Windows 10/11 x64
+        - macOS Apple Silicon
+        - macOS Intel
+        - Linux x64
+        - Autre
+    validations:
+      required: true
+  - type: input
+    id: installer
+    attributes:
+      label: Fichier installe
+      placeholder: ".exe, .msi, .dmg, .AppImage, .deb"
+  - type: textarea
+    id: problem
+    attributes:
+      label: Probleme observe
+      description: Decrire ce qui se passe.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Etapes pour reproduire
+      description: Indiquer le parcours precis.
+      placeholder: |
+        1. Ouvrir...
+        2. Cliquer...
+        3. Constater...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportement attendu
+      description: Decrire ce qui aurait du se passer.
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexte utile
+      description: Moteurs optionnels installes, messages d'erreur, capture non sensible, logs anonymises.
+

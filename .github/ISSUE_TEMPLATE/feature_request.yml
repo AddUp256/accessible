@@ -1,0 +1,36 @@
+name: Demande d'amelioration
+description: Proposer une evolution utile pour Accessible.
+title: "[Amelioration]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Besoin utilisateur
+      description: Quel probleme concret cette amelioration resout-elle ?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposition
+      description: Decrire le comportement souhaite.
+    validations:
+      required: true
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Public concerne
+      options:
+        - Utilisation personnelle
+        - Aidant ou proche
+        - Enseignement
+        - Accompagnement professionnel
+        - Association ou structure
+        - Autre
+  - type: textarea
+    id: accessibility
+    attributes:
+      label: Points d'accessibilite
+      description: Indiquer les contraintes visuelles, motrices, cognitives ou linguistiques a prendre en compte.
+

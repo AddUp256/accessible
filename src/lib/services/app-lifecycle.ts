@@ -1,0 +1,83 @@
+import { get } from 'svelte/store';
+import { invoke } from '@tauri-apps/api/core';
+import { getCurrentWindow } from '@tauri-apps/api/window';
+import type { AccessibleProfile } from '$lib/types/profile';
+import { profileStore } from '$lib/stores/profile';
+import { saveProfileAsync } from '$lib/services/storage/local';
+import { isTauriRuntime } from '$lib/services/storage/tauri';
+
+let quitting = false;
+const QUIT_FLUSH_TIMEOUT_MS = 1800;
+
+/** Enregistre le profil actif avant fermeture. */
+export async function flushProfileState(profile?: AccessibleProfile): Promise<void> {
+	const snapshot = profile ?? get(profileStore);
+	if (snapshot.privacy.guestMode) return;
+	await saveProfileAsync(snapshot);
+}
+
+async function flushProfileStateBeforeQuit(): Promise<void> {
+	let timeoutId: ReturnType<typeof setTimeout> | undefined;
+	try {
+		await Promise.race([
+			flushProfileState(),
+			new Promise<void>((resolve) => {
+				timeoutId = setTimeout(resolve, QUIT_FLUSH_TIMEOUT_MS);
+			})
+		]);
+	} catch (error) {
+		console.warn('Profile save before quit failed.', error);
+	} finally {
+		if (timeoutId) clearTimeout(timeoutId);
+	}
+}
+
+/** Quitte l'application (Tauri) ou tente de fermer l'onglet (web). */
+export async function quitApplication(): Promise<void> {
+	if (quitting) return;
+	quitting = true;
+
+	try {
+		await flushProfileStateBeforeQuit();
+		if (isTauriRuntime()) {
+			await invoke('quit_application');
+			return;
+		}
+		window.close();
+	} catch (error) {
+		quitting = false;
+		throw error;
+	}
+
+	if (!isTauriRuntime()) {
+		quitting = false;
+	}
+}
+
+/** Écouteurs fermeture fenêtre / onglet — à brancher dans le layout racine. */
+export async function bindAppLifecycle(): Promise<() => void> {
+	const cleanups: Array<() => void> = [];
+
+	if (isTauriRuntime()) {
+		const win = getCurrentWindow();
+		const unlisten = await win.onCloseRequested(async (event) => {
+			if (quitting) return;
+			event.preventDefault();
+			await quitApplication();
+		});
+		cleanups.push(unlisten);
+	}
+
+	const onBeforeUnload = () => {
+		const profile = get(profileStore);
+		if (!profile.privacy.guestMode) {
+			void saveProfileAsync(profile);
+		}
+	};
+	window.addEventListener('beforeunload', onBeforeUnload);
+	cleanups.push(() => window.removeEventListener('beforeunload', onBeforeUnload));
+
+	return () => {
+		for (const fn of cleanups) fn();
+	};
+}

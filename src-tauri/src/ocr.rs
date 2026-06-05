@@ -1,0 +1,258 @@
+use std::fs;
+use std::path::{Path, PathBuf};
+use std::process::Command;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::{SystemTime, UNIX_EPOCH};
+
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
+
+use tauri::Manager;
+
+const ALLOWED_EXTENSIONS: &[&str] = &["png", "jpg", "jpeg", "gif", "bmp", "tif", "tiff", "webp"];
+static WORK_COUNTER: AtomicU64 = AtomicU64::new(0);
+
+fn hidden_command(program: &str) -> Command {
+    #[cfg(windows)]
+    {
+        let mut command = Command::new(program);
+        command.creation_flags(0x08000000);
+        command
+    }
+    #[cfg(not(windows))]
+    {
+        Command::new(program)
+    }
+}
+
+fn tesseract_command() -> Command {
+    hidden_command("tesseract")
+}
+
+fn pdftoppm_command() -> Command {
+    hidden_command("pdftoppm")
+}
+
+pub fn is_tesseract_installed() -> bool {
+    tesseract_command()
+        .arg("--version")
+        .output()
+        .map(|output| output.status.success())
+        .unwrap_or(false)
+}
+
+fn is_pdftoppm_installed() -> bool {
+    pdftoppm_command()
+        .arg("-v")
+        .output()
+        .map(|output| output.status.success())
+        .unwrap_or(false)
+}
+
+fn ocr_work_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+    let dir = app
+        .path()
+        .app_cache_dir()
+        .map_err(|e| e.to_string())?
+        .join("ocr");
+    fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    Ok(dir)
+}
+
+fn work_stamp() -> Result<String, String> {
+    let millis = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|e| e.to_string())
+        .map(|duration| duration.as_millis())?;
+    let counter = WORK_COUNTER.fetch_add(1, Ordering::Relaxed);
+    Ok(format!("{}-{}-{}", millis, std::process::id(), counter))
+}
+
+fn safe_image_path(work_dir: &Path, filename: &str) -> Result<PathBuf, String> {
+    let ext = Path::new(filename)
+        .extension()
+        .and_then(|e| e.to_str())
+        .map(|e| e.to_lowercase())
+        .unwrap_or_else(|| "png".to_string());
+
+    if !ALLOWED_EXTENSIONS.contains(&ext.as_str()) {
+        return Err("Extension d'image non prise en charge.".to_string());
+    }
+
+    Ok(work_dir.join(format!("ocr_{}.{}", work_stamp()?, ext)))
+}
+
+fn run_tesseract_on_file(input_path: &Path, lang: &str) -> Result<String, String> {
+    let output = tesseract_command()
+        .arg(input_path)
+        .arg("stdout")
+        .arg("-l")
+        .arg(lang)
+        .output()
+        .map_err(|e| {
+            format!(
+                "Impossible d'exécuter Tesseract. Vérifiez qu'il est installé et dans le PATH : {e}"
+            )
+        })?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(if stderr.trim().is_empty() {
+            "Tesseract n'a pas pu lire ce fichier.".to_string()
+        } else {
+            format!("Erreur Tesseract : {}", stderr.trim())
+        });
+    }
+
+    Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
+}
+
+fn ocr_pdf_pages(work_dir: &Path, pdf_path: &Path, lang: &str) -> Result<String, String> {
+    let stamp = work_stamp()?;
+    let prefix = work_dir.join(format!("page_{stamp}"));
+
+    let output = pdftoppm_command()
+        .arg("-png")
+        .arg("-r")
+        .arg("300")
+        .arg(pdf_path)
+        .arg(&prefix)
+        .output()
+        .map_err(|e| format!("Impossible d'exécuter pdftoppm : {e}"))?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(if stderr.trim().is_empty() {
+            "pdftoppm n'a pas pu convertir ce PDF.".to_string()
+        } else {
+            format!("Erreur pdftoppm : {}", stderr.trim())
+        });
+    }
+
+    let prefix_name = prefix
+        .file_name()
+        .and_then(|name| name.to_str())
+        .ok_or_else(|| "Impossible de nommer les pages PDF.".to_string())?
+        .to_string();
+
+    let mut page_paths: Vec<PathBuf> = fs::read_dir(work_dir)
+        .map_err(|e| e.to_string())?
+        .filter_map(|entry| entry.ok().map(|entry| entry.path()))
+        .filter(|path| {
+            path.extension()
+                .and_then(|ext| ext.to_str())
+                .is_some_and(|ext| ext.eq_ignore_ascii_case("png"))
+                && path
+                    .file_name()
+                    .and_then(|name| name.to_str())
+                    .is_some_and(|name| name.starts_with(&prefix_name))
+        })
+        .collect();
+
+    page_paths.sort();
+
+    if page_paths.is_empty() {
+        return Err(
+            "Aucune page extraite du PDF. Installez Poppler (pdftoppm) ou un Tesseract avec support PDF."
+                .to_string(),
+        );
+    }
+
+    let mut combined = String::new();
+    for (index, page_path) in page_paths.iter().enumerate() {
+        let page_text = run_tesseract_on_file(page_path, lang)?;
+        let _ = fs::remove_file(page_path);
+        if page_text.is_empty() {
+            continue;
+        }
+        if !combined.is_empty() {
+            combined.push_str("\n\n");
+        }
+        if page_paths.len() > 1 {
+            combined.push_str(&format!("--- Page {} ---\n", index + 1));
+        }
+        combined.push_str(&page_text);
+    }
+
+    Ok(combined.trim().to_string())
+}
+
+fn ocr_pdf_bytes(app: &tauri::AppHandle, pdf_bytes: &[u8], lang: &str) -> Result<String, String> {
+    if pdf_bytes.is_empty() {
+        return Err("Fichier PDF vide.".to_string());
+    }
+
+    if !is_tesseract_installed() {
+        return Err(
+            "Tesseract OCR n'est pas installé ou introuvable. Installez Tesseract et le pack de langue français (fra), puis relancez l'application.".to_string(),
+        );
+    }
+
+    let work_dir = ocr_work_dir(app)?;
+    let pdf_path = work_dir.join(format!("ocr_{}.pdf", work_stamp()?));
+    fs::write(&pdf_path, pdf_bytes).map_err(|e| e.to_string())?;
+
+    let direct = run_tesseract_on_file(&pdf_path, lang);
+    let _ = fs::remove_file(&pdf_path);
+
+    if let Ok(text) = direct {
+        if !text.is_empty() {
+            return Ok(text);
+        }
+    }
+
+    if !is_pdftoppm_installed() {
+        return Err(
+            "Ce PDF scanné n'a pas pu être lu directement. Installez Poppler (pdftoppm) pour convertir les pages, ou exportez le PDF en images.".to_string(),
+        );
+    }
+
+    fs::write(&pdf_path, pdf_bytes).map_err(|e| e.to_string())?;
+    let result = ocr_pdf_pages(&work_dir, &pdf_path, lang);
+    let _ = fs::remove_file(&pdf_path);
+    result
+}
+
+#[tauri::command]
+pub fn is_tesseract_available() -> bool {
+    is_tesseract_installed()
+}
+
+#[tauri::command]
+pub fn ocr_extract_text(
+    app: tauri::AppHandle,
+    image_bytes: Vec<u8>,
+    filename: String,
+    lang: Option<String>,
+) -> Result<String, String> {
+    if image_bytes.is_empty() {
+        return Err("Fichier image vide.".to_string());
+    }
+
+    let lang = lang.unwrap_or_else(|| "fra".to_string());
+    let lower = filename.to_lowercase();
+
+    if lower.ends_with(".pdf") {
+        return ocr_pdf_bytes(&app, &image_bytes, &lang);
+    }
+
+    if !is_tesseract_installed() {
+        return Err(
+            "Tesseract OCR n'est pas installé ou introuvable. Installez Tesseract et le pack de langue français (fra), puis relancez l'application.".to_string(),
+        );
+    }
+
+    let work_dir = ocr_work_dir(&app)?;
+    let input_path = safe_image_path(&work_dir, &filename)?;
+
+    fs::write(&input_path, image_bytes).map_err(|e| e.to_string())?;
+
+    let text = run_tesseract_on_file(&input_path, &lang)?;
+    let _ = fs::remove_file(&input_path);
+
+    if text.is_empty() {
+        return Err("Aucun texte détecté dans l'image.".to_string());
+    }
+
+    Ok(text)
+}

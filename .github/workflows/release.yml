@@ -1,0 +1,113 @@
+name: Desktop release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to create or update, for example v0.1.0"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.platform }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x64
+            platform: windows-latest
+            args: ""
+            rust-targets: ""
+          - name: linux-x64
+            platform: ubuntu-22.04
+            args: ""
+            rust-targets: ""
+          - name: macos-apple-silicon
+            platform: macos-14
+            args: "--target aarch64-apple-darwin"
+            rust-targets: "aarch64-apple-darwin"
+          - name: macos-intel
+            platform: macos-15-intel
+            args: "--target x86_64-apple-darwin"
+            rust-targets: "x86_64-apple-darwin"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Add Rust target
+        if: matrix.rust-targets != ''
+        run: rustup target add ${{ matrix.rust-targets }}
+
+      - name: Install Linux system dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            curl \
+            file \
+            libayatana-appindicator3-dev \
+            libssl-dev \
+            librsvg2-dev \
+            libwebkit2gtk-4.1-dev \
+            libxdo-dev \
+            patchelf \
+            wget
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Validate project before packaging
+        run: npm run check && npm run validate:lang-packs
+
+      - name: Configure macOS ad-hoc signing when no certificate secret is provided
+        if: startsWith(matrix.platform, 'macos')
+        shell: bash
+        env:
+          APPLE_SIGNING_IDENTITY_SECRET: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        run: |
+          echo "APPLE_SIGNING_IDENTITY=${APPLE_SIGNING_IDENTITY_SECRET:--}" >> "$GITHUB_ENV"
+
+      - name: Build and attach release assets
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_SIGNING_IDENTITY: ${{ env.APPLE_SIGNING_IDENTITY }}
+        with:
+          tagName: ${{ github.event.inputs.tag || github.ref_name }}
+          releaseName: "Accessible ${{ github.event.inputs.tag || github.ref_name }}"
+          releaseBody: |
+            Accessible est une application locale pour adapter la lecture, l'ecriture, l'organisation, la communication et le travail numerique.
+
+            Compatibilite publiee :
+            - Windows 10/11 x64 : installateurs NSIS (.exe) et MSI.
+            - macOS Intel et Apple Silicon : bundles .dmg/.app. Les builds sans certificat Apple restent non notarises.
+            - Linux x64 : .deb et AppImage, base Ubuntu 22.04 / Debian 12 ou plus recent conseillee.
+
+            Voir README.md, COMPATIBILITY.md et PUBLISHING.md pour les avertissements de signature, les dependances optionnelles et le choix du bon fichier.
+          releaseDraft: true
+          prerelease: true
+          args: ${{ matrix.args }}
+          releaseAssetNamePattern: "Accessible_[version]_[platform]_[arch][setup][ext]"
+          uploadWorkflowArtifacts: true
+          workflowArtifactNamePattern: "Accessible-[version]-[platform]-[arch]-[bundle]"
+          retryAttempts: 2

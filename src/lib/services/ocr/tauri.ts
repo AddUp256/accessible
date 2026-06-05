@@ -1,0 +1,13 @@
+import { invoke } from '@tauri-apps/api/core';
+
+export async function tauriIsTesseractAvailable(): Promise<boolean> {
+	return invoke<boolean>('is_tesseract_available');
+}
+
+export async function tauriOcrExtractText(
+	imageBytes: number[],
+	filename: string,
+	lang = 'fra'
+): Promise<string> {
+	return invoke<string>('ocr_extract_text', { imageBytes, filename, lang });
+}

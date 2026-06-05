@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "packs": [
+    {
+      "code": "es",
+      "labelFr": "Espagnol",
+      "nativeName": "Español",
+      "file": "es.json"
+    },
+    {
+      "code": "ar",
+      "labelFr": "Arabe",
+      "nativeName": "العربية",
+      "file": "ar.json"
+    },
+    {
+      "code": "zh",
+      "labelFr": "Chinois",
+      "nativeName": "中文",
+      "file": "zh.json"
+    },
+    {
+      "code": "it",
+      "labelFr": "Italien",
+      "nativeName": "Italiano",
+      "file": "it.json"
+    },
+    {
+      "code": "pt",
+      "labelFr": "Portugais",
+      "nativeName": "Português",
+      "file": "pt.json"
+    },
+    {
+      "code": "de",
+      "labelFr": "Allemand",
+      "nativeName": "Deutsch",
+      "file": "de.json"
+    },
+    {
+      "code": "hi",
+      "labelFr": "Hindi",
+      "nativeName": "हिन्दी",
+      "file": "hi.json"
+    },
+    {
+      "code": "uk",
+      "labelFr": "Ukrainien",
+      "nativeName": "Українська",
+      "file": "uk.json"
+    },
+    {
+      "code": "tr",
+      "labelFr": "Turc",
+      "nativeName": "Türkçe",
+      "file": "tr.json"
+    }
+  ]
+}
