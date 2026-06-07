@@ -14,6 +14,13 @@
 	import { settings, profileStore } from '$lib/stores/profile';
 	import { isExpertDetail, isVerySimpleDetail } from '$lib/utils/detail-level';
 	import { FONTS_BY_ID } from '$lib/config/fonts-catalog';
+	import {
+		CUSTOM_FONT_ACCEPT,
+		CUSTOM_FONT_MAX_BYTES,
+		ensureCustomFontLoaded,
+		readFontFileAsDataUrl,
+		sanitizeCustomFontName
+	} from '$lib/modules/reading/custom-font';
 	import { READING_FONT_OPTIONS } from '$lib/modules/reading/font-stacks';
 	import { saveReadingPreferences } from '$lib/modules/reading/preferences';
 	import { notifyUserI18n } from '$lib/i18n';
@@ -26,8 +33,10 @@
 	let { ondistractionChange }: { ondistractionChange?: (value: boolean) => void } = $props();
 
 	let ttsHint = $state('');
+	let fontImportStatus = $state('');
 	let speechVoices = $state<SpeechVoiceOption[]>([]);
 	let piperVoices = $state<PiperVoice[]>([]);
+	let fontFileInput = $state<HTMLInputElement | null>(null);
 
 	const expert = $derived(isExpertDetail($profileStore));
 	const verySimple = $derived(isVerySimpleDetail($profileStore));
@@ -52,9 +61,12 @@
 	];
 
 	const fontOptions = $derived(
-		verySimple && !expert
-			? (['system', 'atkinson-hyperlegible', 'opendyslexic'] as const)
-			: READING_FONT_OPTIONS
+		[
+			...($settings.reading.customFontDataUrl ? (['custom'] as ReadingSettings['font'][]) : []),
+			...(verySimple && !expert
+				? (['system', 'atkinson-hyperlegible', 'opendyslexic'] as ReadingSettings['font'][])
+				: READING_FONT_OPTIONS)
+		] as ReadingSettings['font'][]
 	);
 
 	const backgroundOptions = $derived(
@@ -132,6 +144,59 @@
 		saveReadingPreferences();
 		notifyUserI18n('dyn.read.prefsSaved', 'minimal');
 	}
+
+	function isSupportedFontFile(file: File): boolean {
+		return /\.(ttf|otf|woff2?)$/i.test(file.name) || /^font\/(ttf|otf|woff2?)$/i.test(file.type);
+	}
+
+	async function importFont(event: Event) {
+		const input = event.currentTarget as HTMLInputElement;
+		const file = input.files?.[0];
+		input.value = '';
+		if (!file) return;
+
+		if (!isSupportedFontFile(file)) {
+			fontImportStatus = 'Format non pris en charge. Utilisez TTF, OTF, WOFF ou WOFF2.';
+			return;
+		}
+
+		if (file.size > CUSTOM_FONT_MAX_BYTES) {
+			fontImportStatus = 'Police trop volumineuse. Limite : 2 Mo.';
+			return;
+		}
+
+		try {
+			const familyName = sanitizeCustomFontName(file.name);
+			const dataUrl = await readFontFileAsDataUrl(file);
+			await ensureCustomFontLoaded({
+				...$settings.reading,
+				font: 'custom',
+				customFontName: familyName,
+				customFontFileName: file.name,
+				customFontDataUrl: dataUrl
+			});
+			patchReading({
+				font: 'custom',
+				customFontName: familyName,
+				customFontFileName: file.name,
+				customFontDataUrl: dataUrl
+			});
+			fontImportStatus = `Police importée : ${familyName}.`;
+		} catch (error) {
+			fontImportStatus =
+				error instanceof Error ? error.message : "Impossible d'importer cette police.";
+		}
+	}
+
+	function removeCustomFont() {
+		patchReading({
+			font: $settings.reading.font === 'custom' ? 'atkinson-hyperlegible' : $settings.reading.font,
+			customFontName: '',
+			customFontFileName: '',
+			customFontDataUrl: ''
+		});
+		fontImportStatus = 'Police importée retirée.';
+	}
 </script>
 
 <aside class="reading-controls card" aria-label="Réglages de lecture">
@@ -144,10 +209,46 @@
 			onchange={(e) => patchReading({ font: e.currentTarget.value as ReadingSettings['font'] })}
 		>
 			{#each fontOptions as fontId}
-				<option value={fontId}>{FONTS_BY_ID[fontId]?.name ?? fontId}</option>
+				<option value={fontId}>
+					{fontId === 'custom'
+						? $settings.reading.customFontName ||
+							bilingualLabel('Police importée', 'mod.read.customFont', $settings.ui)
+						: FONTS_BY_ID[fontId]?.name ?? fontId}
+				</option>
 			{/each}
 		</select>
 	</label>
+
+	<div class="font-import">
+		<input
+			bind:this={fontFileInput}
+			class="font-file"
+			type="file"
+			accept={CUSTOM_FONT_ACCEPT}
+			aria-hidden="true"
+			tabindex="-1"
+			onchange={importFont}
+		/>
+		<div class="font-import-actions">
+			<button type="button" class="btn btn-secondary" onclick={() => fontFileInput?.click()}>
+				<BiText fr="Importer une police" key="mod.read.importFont" inline />
+			</button>
+			{#if $settings.reading.customFontDataUrl}
+				<button type="button" class="btn btn-secondary" onclick={removeCustomFont}>
+					<BiText fr="Retirer la police importée" key="mod.read.removeCustomFont" inline />
+				</button>
+			{/if}
+		</div>
+		<p class="control-hint">
+			<BiText
+				fr="Formats acceptés : TTF, OTF, WOFF ou WOFF2, jusqu’à 2 Mo."
+				key="mod.read.importFontHint"
+			/>
+		</p>
+		{#if fontImportStatus}
+			<p class="control-hint" role="status">{fontImportStatus}</p>
+		{/if}
+	</div>
 
 	<label class="control-field">
 		<span
@@ -383,6 +484,30 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-xs);
+	}
+
+	.font-import {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-xs);
+	}
+
+	.font-import-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm);
+	}
+
+	.font-file {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	.control-field select,

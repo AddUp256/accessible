@@ -4,6 +4,7 @@
 		usesReadingDecoration
 	} from '$lib/modules/reading/text-decoration';
 	import { toFalcText, readingSettingsToStyle } from '$lib/modules/reading/font-stacks';
+	import { ensureCustomFontLoaded } from '$lib/modules/reading/custom-font';
 	import { bilingualLabel } from '$lib/i18n';
 	import type { ReadingSettings } from '$lib/types/profile';
 	import { profileStore, settings } from '$lib/stores/profile';
@@ -39,6 +40,10 @@
 	function moveLine(delta: number) {
 		activeLine = Math.max(0, Math.min(lines.length - 1, activeLine + delta));
 	}
+
+	$effect(() => {
+		void ensureCustomFontLoaded(readingSettings);
+	});
 
 	$effect(() => {
 		if (activeLine >= lines.length) activeLine = Math.max(0, lines.length - 1);

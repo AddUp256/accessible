@@ -346,6 +346,26 @@ export class TauriTTSService implements TTSService {
 
 
 
+	private canFallbackToWebSpeech(options: TTSOptions): boolean {
+
+		return (!options.engine || options.engine === 'auto') && this.web.isAvailable();
+
+	}
+
+
+
+	private fallbackToWebSpeech(text: string, options: TTSOptions): boolean {
+
+		this.audio = null;
+
+		this.speaking = false;
+
+		return this.web.speak(text, { ...options, engine: 'web' });
+
+	}
+
+
+
 	speak(text: string, options: TTSOptions = {}) {
 
 		const trimmed = text.trim();
@@ -446,7 +466,19 @@ export class TauriTTSService implements TTSService {
 
 			};
 
-			audio.onerror = () => {
+			let failureHandled = false;
+
+			const handleAudioFailure = () => {
+
+				if (failureHandled) return;
+
+				failureHandled = true;
+
+				if (this.canFallbackToWebSpeech(options) && this.fallbackToWebSpeech(text, options)) {
+
+					return;
+
+				}
 
 				this.audio = null;
 
@@ -456,13 +488,29 @@ export class TauriTTSService implements TTSService {
 
 			};
 
+			audio.onerror = handleAudioFailure;
 
 
-			await audio.play();
+
+			try {
+
+				await audio.play();
+
+			} catch {
+
+				handleAudioFailure();
+
+			}
 
 		} catch (error) {
 
 			this.speaking = false;
+
+			if (this.canFallbackToWebSpeech(options) && this.fallbackToWebSpeech(text, options)) {
+
+				return;
+
+			}
 
 			options.onError?.(
 

@@ -1,8 +1,10 @@
 import type { FontId, GlossaryEntry, ReadingSettings } from '$lib/types/profile';
 import { simplifyWithFalcEngine } from '$lib/modules/comprehension/falc-engine';
+import { customFontFamily } from '$lib/modules/reading/custom-font';
 
 /** Piles font-family — polices embarquées via @fontsource (Phase 41). */
 export const FONT_FAMILY_STACK: Record<FontId, string> = {
+	custom: 'system-ui, "Segoe UI", Roboto, sans-serif',
 	'atkinson-hyperlegible': '"Atkinson Hyperlegible", system-ui, sans-serif',
 	luciole: 'Luciole, system-ui, sans-serif',
 	lexend: 'Lexend, system-ui, sans-serif',
@@ -59,6 +61,16 @@ export const READING_FONT_OPTIONS: FontId[] = [
 	'inter'
 ];
 
+function quoteFontFamily(familyName: string): string {
+	return `"${familyName.replace(/["\\]/g, '')}", system-ui, "Segoe UI", Roboto, sans-serif`;
+}
+
+function resolveFontFamily(settings: ReadingSettings): string {
+	const familyName = customFontFamily(settings);
+	if (familyName) return quoteFontFamily(familyName);
+	return FONT_FAMILY_STACK[settings.font] ?? FONT_FAMILY_STACK.system;
+}
+
 export function readingSettingsToStyle(settings: ReadingSettings): string {
 	const colors =
 		settings.background === 'custom' && settings.backgroundColor && settings.textColor
@@ -66,7 +78,7 @@ export function readingSettingsToStyle(settings: ReadingSettings): string {
 			: READING_BACKGROUND_COLORS[settings.background];
 
 	return `
-		font-family: ${FONT_FAMILY_STACK[settings.font]};
+		font-family: ${resolveFontFamily(settings)};
 		font-size: ${settings.fontSize}px;
 		line-height: ${settings.lineHeight};
 		letter-spacing: ${settings.letterSpacing}em;

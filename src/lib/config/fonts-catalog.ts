@@ -269,6 +269,17 @@ export const FONTS_CATALOG: FontMeta[] = [
 		true
 	),
 	font(
+		'custom',
+		'Police importée',
+		'Utilisateur',
+		'',
+		'general',
+		['police personnelle', 'compatibilité'],
+		'',
+		false,
+		false
+	),
+	font(
 		'system',
 		'Police système',
 		'—',

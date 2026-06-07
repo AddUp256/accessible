@@ -41,7 +41,15 @@ function formatSettingSummaries(profile: AccessibleProfile): SettingSummary[] {
 	return [
 		{ key: 'ui.theme', label: 'Thème interface', value: ui.theme },
 		{ key: 'ui.buttonSize', label: 'Taille des boutons', value: ui.buttonSize },
-		{ key: 'reading.font', label: 'Police de lecture', value: FONTS_BY_ID[reading.font]?.name ?? reading.font },
+		{ key: 'ui.textSize', label: "Taille du texte d'interface", value: ui.textSize },
+		{
+			key: 'reading.font',
+			label: 'Police de lecture',
+			value:
+				reading.font === 'custom' && reading.customFontName
+					? `${reading.customFontName} (importée)`
+					: FONTS_BY_ID[reading.font]?.name ?? reading.font
+		},
 		{ key: 'reading.fontSize', label: 'Taille du texte', value: `${reading.fontSize} px` },
 		{ key: 'reading.lineHeight', label: 'Interligne', value: String(reading.lineHeight) },
 		{ key: 'reading.background', label: 'Fond de lecture', value: reading.background },

@@ -21,6 +21,12 @@
 		{ value: 'veryLarge', fr: 'Très grand', key: 'size.veryLarge' }
 	];
 
+	const textSizes: { value: UISettings['textSize']; fr: string; key: UiKey }[] = [
+		{ value: 'normal', fr: 'Normal', key: 'size.normal' },
+		{ value: 'large', fr: 'Grand', key: 'size.large' },
+		{ value: 'veryLarge', fr: 'Très grand', key: 'size.veryLarge' }
+	];
+
 	const notificationLevels: { value: SensorySettings['notifications']; fr: string; key: UiKey }[] =
 		[
 			{ value: 'off', fr: 'Désactivées', key: 'notify.off' },
@@ -80,6 +86,18 @@
 				onchange={(e) => patchUi({ buttonSize: e.currentTarget.value as UISettings['buttonSize'] })}
 			>
 				{#each buttonSizes as size}
+					<option value={size.value}>{bilingualLabel(size.fr, size.key, $settings.ui)}</option>
+				{/each}
+			</select>
+		</label>
+
+		<label class="expert-field">
+			<span><BiText fr="Taille du texte" key="panel.expert.textSize" inline /></span>
+			<select
+				value={$settings.ui.textSize}
+				onchange={(e) => patchUi({ textSize: e.currentTarget.value as UISettings['textSize'] })}
+			>
+				{#each textSizes as size}
 					<option value={size.value}>{bilingualLabel(size.fr, size.key, $settings.ui)}</option>
 				{/each}
 			</select>

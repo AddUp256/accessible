@@ -66,6 +66,7 @@ export type FunctionalCategory =
 	| 'language';
 
 export type FontId =
+	| 'custom'
 	| 'atkinson-hyperlegible'
 	| 'luciole'
 	| 'lexend'
@@ -173,6 +174,7 @@ export interface FunctionalProfiles {
 export interface UISettings {
 	theme: 'cream' | 'light' | 'dark' | 'highContrast';
 	buttonSize: 'normal' | 'large' | 'veryLarge';
+	textSize: 'normal' | 'large' | 'veryLarge';
 	showPictograms: boolean;
 	detailLevel: 'verySimple' | 'standard' | 'expert';
 	interfaceTTS: boolean;
@@ -190,6 +192,9 @@ export interface UISettings {
 
 export interface ReadingSettings {
 	font: FontId;
+	customFontName: string;
+	customFontFileName: string;
+	customFontDataUrl: string;
 	fontSize: number;
 	lineHeight: number;
 	letterSpacing: number;
@@ -549,6 +554,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
 	ui: {
 		theme: 'cream',
 		buttonSize: 'large',
+		textSize: 'normal',
 		showPictograms: false,
 		detailLevel: 'standard',
 		interfaceTTS: false,
@@ -561,6 +567,9 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
 	},
 	reading: {
 		font: 'atkinson-hyperlegible',
+		customFontName: '',
+		customFontFileName: '',
+		customFontDataUrl: '',
 		fontSize: 18,
 		lineHeight: 1.6,
 		letterSpacing: 0,

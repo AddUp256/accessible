@@ -135,6 +135,7 @@
 		class="app-shell"
 		data-theme={$settings.ui.theme}
 		data-button-size={effectiveButtonSize}
+		data-text-size={$settings.ui.textSize ?? 'normal'}
 		class:reduce-motion={!$settings.ui.animations || $settings.sensory.reducedMotion || crisisMode}
 		class:crisis-active={crisisMode}
 	>
