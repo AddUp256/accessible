@@ -13,6 +13,7 @@
 	import AboutPanel from '$lib/components/settings/AboutPanel.svelte';
 	import EncryptionPanel from '$lib/components/settings/EncryptionPanel.svelte';
 	import LanguageSettingsPanel from '$lib/components/settings/LanguageSettingsPanel.svelte';
+	import InstallationGuidePanel from '$lib/components/settings/InstallationGuidePanel.svelte';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import BilingualText from '$lib/components/ui/BilingualText.svelte';
@@ -198,6 +199,8 @@
 <AppModePanel />
 
 <LanguageSettingsPanel />
+
+<InstallationGuidePanel />
 
 <ExpertSettingsPanel />
 

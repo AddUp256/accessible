@@ -17,7 +17,7 @@ Les versions prêtes à installer seront publiées dans les **GitHub Releases** 
 
 Les premiers installateurs peuvent ne pas être signés avec un certificat éditeur. Windows SmartScreen ou macOS Gatekeeper peuvent donc afficher un avertissement tant que la signature Windows et la notarisation Apple ne sont pas configurées.
 
-Voir **[COMPATIBILITY.md](./COMPATIBILITY.md)** pour le détail des plateformes, limites et dépendances optionnelles. Voir **[PUBLISHING.md](./PUBLISHING.md)** pour publier une release GitHub.
+Voir **[INSTALLATION.md](./INSTALLATION.md)** pour les étapes clic par clic, **[COMPATIBILITY.md](./COMPATIBILITY.md)** pour le détail des plateformes, limites et dépendances optionnelles, et **[PUBLISHING.md](./PUBLISHING.md)** pour publier une release GitHub.
 
 ## Démarrage
 
@@ -47,7 +47,7 @@ Ouvrir l'URL affichée (souvent `http://localhost:5173`).
 | `npm run tauri:build:linux` | deb + AppImage (Linux) |
 | `npm run tauri:build:macos` | dmg + app (macOS Apple Silicon) |
 
-Guide builds : **[BUILD.md](./BUILD.md)** · Compatibilité : **[COMPATIBILITY.md](./COMPATIBILITY.md)** · Publication : **[PUBLISHING.md](./PUBLISHING.md)** · Mode portable : **[PORTABLE.md](./PORTABLE.md)**
+Guide builds : **[BUILD.md](./BUILD.md)** · Installation : **[INSTALLATION.md](./INSTALLATION.md)** · Compatibilité : **[COMPATIBILITY.md](./COMPATIBILITY.md)** · Publication : **[PUBLISHING.md](./PUBLISHING.md)** · Mode portable : **[PORTABLE.md](./PORTABLE.md)**
 
 ## Application desktop (Tauri)
 
@@ -80,4 +80,4 @@ SvelteKit (SPA) · TypeScript strict · CSS variables · Tauri 2
 
 ## Documentation
 
-Voir [PROJECT_STATUS.md](./PROJECT_STATUS.md), [TASKS.md](./TASKS.md), [ARCHITECTURE.md](./ARCHITECTURE.md), [EXTERNAL_DEPENDENCIES.md](./EXTERNAL_DEPENDENCIES.md), [BUILD.md](./BUILD.md), [COMPATIBILITY.md](./COMPATIBILITY.md), [PUBLISHING.md](./PUBLISHING.md), [PRIVACY.md](./PRIVACY.md), [SECURITY.md](./SECURITY.md), [SUPPORT.md](./SUPPORT.md), [CHANGELOG.md](./CHANGELOG.md), [PORTABLE.md](./PORTABLE.md).
+Voir [PROJECT_STATUS.md](./PROJECT_STATUS.md), [TASKS.md](./TASKS.md), [ARCHITECTURE.md](./ARCHITECTURE.md), [EXTERNAL_DEPENDENCIES.md](./EXTERNAL_DEPENDENCIES.md), [BUILD.md](./BUILD.md), [INSTALLATION.md](./INSTALLATION.md), [COMPATIBILITY.md](./COMPATIBILITY.md), [PUBLISHING.md](./PUBLISHING.md), [PRIVACY.md](./PRIVACY.md), [SECURITY.md](./SECURITY.md), [SUPPORT.md](./SUPPORT.md), [CHANGELOG.md](./CHANGELOG.md), [PORTABLE.md](./PORTABLE.md).

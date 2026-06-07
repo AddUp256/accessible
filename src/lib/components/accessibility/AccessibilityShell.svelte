@@ -15,7 +15,7 @@
 			const target = event.target as HTMLElement;
 			if (target.closest('[data-extended-skip]')) return;
 
-			if ($settings.sensory.sounds && target.closest('.btn, button, a[href]')) {
+			if ($settings.ui.audioEnabled && $settings.sensory.sounds && target.closest('.btn, button, a[href]')) {
 				playUiSound();
 			}
 

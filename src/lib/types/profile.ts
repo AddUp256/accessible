@@ -186,6 +186,10 @@ export interface UISettings {
 	secondaryLanguage: string;
 	/** Autorise les fonctions en ligne (ARASAAC, etc.). */
 	internetEnabled: boolean;
+	/** Active ou coupe les lectures audio lancees par Accessible. */
+	audioEnabled: boolean;
+	/** Identifiant du haut-parleur choisi quand le moteur WebView le permet. */
+	audioOutputDeviceId: string;
 	/** Masque le message de bienvenue detaille apres le premier lancement. */
 	firstLaunchIntroDismissed: boolean;
 }
@@ -563,6 +567,8 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
 		bilingualUi: false,
 		secondaryLanguage: 'en',
 		internetEnabled: true,
+		audioEnabled: true,
+		audioOutputDeviceId: '',
 		firstLaunchIntroDismissed: false
 	},
 	reading: {

@@ -20,6 +20,7 @@
 		configLabel,
 		TIMER_I18N_KEYS
 	} from '$lib/i18n';
+	import { applyAudioOutputDevice } from '$lib/services/audio-output';
 
 	const TIMER_ALARM_ACCEPT = 'audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac,.webm';
 
@@ -64,14 +65,21 @@
 	}
 
 	function playTimerAlarm() {
-		if (!$settings.sensory.sounds || typeof window === 'undefined') return;
+		if (!$settings.ui.audioEnabled || !$settings.sensory.sounds || typeof window === 'undefined') return;
 
 		const url = $settings.sensory.timerAlarmDataUrl;
 		if (url) {
 			try {
 				alarmAudio?.pause();
 				alarmAudio = new Audio(url);
-				void alarmAudio.play();
+				void (async () => {
+					try {
+						await applyAudioOutputDevice(alarmAudio as HTMLAudioElement, $settings.ui.audioOutputDeviceId);
+					} catch {
+						/* fallback system output */
+					}
+					await alarmAudio?.play();
+				})();
 				return;
 			} catch {
 				/* fallback beep */

@@ -4,6 +4,7 @@ import { browser } from '$app/environment';
 import { get } from 'svelte/store';
 
 import { isTauriRuntime } from '$lib/services/storage/tauri';
+import { applyAudioOutputDevice } from '$lib/services/audio-output';
 import { settings } from '$lib/stores/profile';
 
 
@@ -34,6 +35,8 @@ const STUB_REASON = DYNAMIC_FR['dyn.service.ttsStub'];
 const PIPER_STUB_REASON = DYNAMIC_FR['dyn.service.ttsPiperStub'];
 
 const ESPEAK_STUB_REASON = DYNAMIC_FR['dyn.service.ttsEspeakStub'];
+
+const AUDIO_DISABLED_REASON = 'Audio désactivé dans Accessible.';
 
 
 
@@ -152,6 +155,14 @@ class WebSpeechTTSService implements TTSService {
 		if (!trimmed) {
 
 			options.onError?.('Aucun texte à lire.');
+
+			return false;
+
+		}
+
+		if (get(settings).ui.audioEnabled === false) {
+
+			options.onError?.(AUDIO_DISABLED_REASON);
 
 			return false;
 
@@ -378,6 +389,14 @@ export class TauriTTSService implements TTSService {
 
 		}
 
+		if (get(settings).ui.audioEnabled === false) {
+
+			options.onError?.(AUDIO_DISABLED_REASON);
+
+			return false;
+
+		}
+
 
 
 		const localEngine = this.resolveLocalEngine(options.engine);
@@ -451,6 +470,16 @@ export class TauriTTSService implements TTSService {
 			this.audio = audio;
 
 			this.speaking = true;
+
+			try {
+
+				await applyAudioOutputDevice(audio, get(settings).ui.audioOutputDeviceId);
+
+			} catch {
+
+				// Fall back to the system output when the selected device is unavailable.
+
+			}
 
 
 

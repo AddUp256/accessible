@@ -25,6 +25,8 @@
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import QuitAppButton from '$lib/components/ui/QuitAppButton.svelte';
 	import InternetToggleButton from '$lib/components/ui/InternetToggleButton.svelte';
+	import AudioOutputControl from '$lib/components/ui/AudioOutputControl.svelte';
+	import HelpMailBubble from '$lib/components/support/HelpMailBubble.svelte';
 	import { bilingualUi, type UiKey } from '$lib/i18n';
 	import {
 		ensureSecondaryLanguagePack,
@@ -176,6 +178,7 @@
 				</h1>
 				<div class="header-actions">
 					<InternetToggleButton />
+					<AudioOutputControl />
 					<QuitAppButton />
 					<button
 						type="button"
@@ -221,6 +224,7 @@
 			<footer class="app-footer">
 				<p><BiText fr="Accessible ne pose pas de diagnostic." key="footer.disclaimer" inline /></p>
 			</footer>
+			<HelpMailBubble />
 		{/if}
 	</div>
 
