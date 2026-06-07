@@ -104,7 +104,7 @@ jobs:
             - Linux x64 : .deb et AppImage, base Ubuntu 22.04 / Debian 12 ou plus recent conseillee.
 
             Voir README.md, COMPATIBILITY.md et PUBLISHING.md pour les avertissements de signature, les dependances optionnelles et le choix du bon fichier.
-          releaseDraft: true
+          releaseDraft: false
           prerelease: true
           args: ${{ matrix.args }}
           releaseAssetNamePattern: "Accessible_[version]_[platform]_[arch][setup][ext]"
