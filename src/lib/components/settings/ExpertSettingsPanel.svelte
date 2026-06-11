@@ -38,6 +38,13 @@
 		profileStore.updateSettings({ ui: partial });
 	}
 
+	function setButtonSize(buttonSize: UISettings['buttonSize']) {
+		profileStore.updateSettings({
+			ui: { buttonSize },
+			motor: { largeButtons: buttonSize === 'veryLarge' }
+		});
+	}
+
 	function patchReading(partial: Partial<ReadingSettings>) {
 		profileStore.updateSettings({ reading: partial });
 	}
@@ -53,6 +60,10 @@
 	function patchMotor(partial: Partial<MotorSettings>) {
 		if (partial.largeButtons === true) {
 			profileStore.updateSettings({ motor: partial, ui: { buttonSize: 'veryLarge' } });
+			return;
+		}
+		if (partial.largeButtons === false && $settings.ui.buttonSize === 'veryLarge') {
+			profileStore.updateSettings({ motor: partial, ui: { buttonSize: 'large' } });
 			return;
 		}
 		profileStore.updateSettings({ motor: partial });
@@ -83,7 +94,7 @@
 			<span><BiText fr="Taille des boutons" key="panel.expert.buttonSize" inline /></span>
 			<select
 				value={$settings.ui.buttonSize}
-				onchange={(e) => patchUi({ buttonSize: e.currentTarget.value as UISettings['buttonSize'] })}
+				onchange={(e) => setButtonSize(e.currentTarget.value as UISettings['buttonSize'])}
 			>
 				{#each buttonSizes as size}
 					<option value={size.value}>{bilingualLabel(size.fr, size.key, $settings.ui)}</option>

@@ -1,263 +1,240 @@
 <script lang="ts">
-
 	import { onMount } from 'svelte';
-
-	import ComfortPanel from '$lib/components/onboarding/ComfortPanel.svelte';
-	import MediaReaderPanel from '$lib/components/reading/MediaReaderPanel.svelte';
-
-	import StepProgress from '$lib/components/ui/StepProgress.svelte';
-
-	import BiText from '$lib/components/ui/BiText.svelte';
-
-	import { completeOnboardingStep, setOnboardingPath } from '$lib/modules/onboarding/actions';
-
-	import { DISCOVERY_STEPS, type DiscoveryStepId } from '$lib/modules/onboarding/discovery-steps';
-
-	import { bilingualUi, type UiKey } from '$lib/i18n';
-
-	import { settings } from '$lib/stores/profile';
-
 	import { goto } from '$app/navigation';
+	import BilingualText from '$lib/components/ui/BilingualText.svelte';
+	import { FUNCTIONAL_NEEDS_BY_ID } from '$lib/config/functional-needs';
+	import { bilingualUi, type UiKey } from '$lib/i18n';
+	import { completeOnboardingStep, setOnboardingPath } from '$lib/modules/onboarding/actions';
+	import { profileStore, settings } from '$lib/stores/profile';
+	import type { FunctionalNeedEntry, FunctionalNeedId, ToolId } from '$lib/types/profile';
 
-
-
-	let stepIndex = $state(0);
-
-
+	const discoveryTabs: {
+		id: string;
+		label: string;
+		key: UiKey;
+		href: string;
+		tools: ToolId[];
+		needs: FunctionalNeedId[];
+		hint: string;
+	}[] = [
+		{
+			id: 'read',
+			label: 'Lire',
+			key: 'nav.read',
+			href: '/lire?from=discovery',
+			tools: ['read_adapted', 'listen_text'],
+			needs: [],
+			hint: "Tester l'affichage, les polices, l'OCR et la lecture."
+		},
+		{
+			id: 'write',
+			label: 'Écrire',
+			key: 'nav.write',
+			href: '/ecrire?from=discovery',
+			tools: ['write_easier', 'correct_text', 'reduce_typing'],
+			needs: [],
+			hint: "Tester l'éditeur, la correction et les aides à la saisie."
+		},
+		{
+			id: 'organize',
+			label: 'Organiser',
+			key: 'nav.organize',
+			href: '/organiser?from=discovery',
+			tools: ['organize_work'],
+			needs: [],
+			hint: 'Tester les étapes, checklists, minuteur, notes et révisions.'
+		},
+		{
+			id: 'understand',
+			label: 'Comprendre',
+			key: 'nav.understand',
+			href: '/comprendre?from=discovery',
+			tools: [],
+			needs: ['besoin_consignes_decoupees'],
+			hint: 'Tester le découpage des consignes et la reformulation.'
+		},
+		{
+			id: 'communicate',
+			label: 'Communiquer',
+			key: 'nav.communicate',
+			href: '/communiquer?from=discovery',
+			tools: ['pictograms'],
+			needs: ['besoin_pictogrammes'],
+			hint: 'Tester les cartes, pictogrammes et messages à montrer.'
+		},
+		{
+			id: 'notes',
+			label: 'Notes',
+			key: 'nav.notes',
+			href: '/notes?from=discovery',
+			tools: [],
+			needs: ['difficulte_prise_notes'],
+			hint: 'Tester la prise de notes et les exports.'
+		}
+	];
 
 	onMount(() => {
-
-		setOnboardingPath('discovery');
-
+		if ($profileStore.onboarding.path !== 'discovery') {
+			setOnboardingPath('discovery', { reset: false });
+		}
 	});
 
-
-
-	const currentStep = $derived(DISCOVERY_STEPS[stepIndex]);
-
-	const total = DISCOVERY_STEPS.length;
-
-
-
-	const introKeys: Partial<Record<DiscoveryStepId, UiKey>> = {
-
-		comfort: 'onboard.discovery.comfort.intro',
-
-		reading: 'onboard.discovery.step.reading.intro',
-
-		writing: 'onboard.discovery.step.writing.intro',
-
-		organization: 'onboard.discovery.step.organization.intro',
-
-		media: 'onboard.discovery.step.media.intro',
-
-		sensory: 'onboard.discovery.step.sensory.intro',
-
-		motor: 'onboard.discovery.step.motor.intro',
-
-		communication: 'onboard.discovery.step.communication.intro',
-
-		summary: 'onboard.discovery.step.summary.intro'
-
-	};
-
-
-
-	const introFr: Partial<Record<DiscoveryStepId, string>> = {
-
-		comfort: "Testez le confort de l'interface. Les changements sont visibles tout de suite.",
-
-		reading: 'Collez un texte, changez la police et la taille, ou écoutez avec la synthèse vocale.',
-
-		writing: "Écrivez un texte simple ou corrigez-le pas à pas avec l'aide orthographique.",
-
-		organization: 'Découpez votre travail en checklists, minuteur ou cartes Kanban.',
-
-		media: 'Importez un fichier audio ou vidéo, réglez la vitesse et lisez la transcription à voix haute.',
-
-		sensory: 'Testez les réglages sensoriels : animations, sons et notifications.',
-
-		motor: 'Réglez la taille des boutons, le temps de clic, la dictée vocale et les confirmations.',
-
-		communication: 'Cartes de communication et pictogrammes ARASAAC pour exprimer vos besoins.',
-
-		summary:
-
-			'Voici ce que nous avons noté pendant ce parcours. Vous pourrez compléter la synthèse à tout moment.'
-
-	};
-
-
-
-	const openModuleLabel = $derived(
-
-		bilingualUi('Ouvrir ce module', 'onboard.discovery.openModule', $settings.ui)
-
-	);
-
-
-
-	function next(markCurrent = true) {
-
-		if (markCurrent) completeOnboardingStep(currentStep.id);
-
-		if (stepIndex >= total - 1) {
-
-			goto('/onboarding/complete');
-
-			return;
-
-		}
-
-		stepIndex += 1;
-
+	function isDiscoveryTabActive(tab: (typeof discoveryTabs)[number]): boolean {
+		const toolActive = tab.tools.some((tool) => $profileStore.activatedTools.includes(tool));
+		const profileEntries = Object.values($profileStore.functionalProfiles) as FunctionalNeedEntry[][];
+		const needActive = profileEntries.some((entries) =>
+			entries.some((entry) => tab.needs.includes(entry.id as FunctionalNeedId))
+		);
+		return toolActive || needActive;
 	}
 
+	function toggleDiscoveryTab(tab: (typeof discoveryTabs)[number]) {
+		const now = new Date().toISOString();
 
+		profileStore.patch((profile) => {
+			const active =
+				tab.tools.some((tool) => profile.activatedTools.includes(tool)) ||
+				(Object.values(profile.functionalProfiles) as FunctionalNeedEntry[][]).some((entries) =>
+					entries.some((entry) => tab.needs.includes(entry.id as FunctionalNeedId))
+				);
 
-	function skip() {
+			const activatedTools = active
+				? profile.activatedTools.filter((tool) => !tab.tools.includes(tool))
+				: Array.from(new Set([...profile.activatedTools, ...tab.tools]));
 
-		completeOnboardingStep(`${currentStep.id}_skipped`);
+			const functionalProfiles = { ...profile.functionalProfiles };
+			for (const need of tab.needs) {
+				const category = FUNCTIONAL_NEEDS_BY_ID[need]?.category;
+				if (!category) continue;
 
-		next(false);
+				if (active) {
+					functionalProfiles[category] = functionalProfiles[category].filter(
+						(entry) => entry.id !== need
+					);
+				} else if (!functionalProfiles[category].some((entry) => entry.id === need)) {
+					functionalProfiles[category] = [
+						...functionalProfiles[category],
+						{ id: need, source: 'onboarding', confirmedAt: now, confidence: 'declared' }
+					];
+				}
+			}
 
+			return { ...profile, activatedTools, functionalProfiles };
+		});
 	}
 
+	function finishDiscovery() {
+		completeOnboardingStep('discovery_tabs');
+		goto('/onboarding/complete');
+	}
 </script>
 
-
-
 <svelte:head>
-
-	<title>Parcours guidé — Accessible</title>
-
+	<title>Personnalisation guidée - Accessible</title>
 </svelte:head>
 
-
-
-<StepProgress current={stepIndex + 1} total={total} />
-
-
-
-<section class="card">
-
-	<h2>{currentStep.label}</h2>
-
-
-
-	{#if currentStep.id === 'comfort'}
-
-		<p><BiText fr={introFr.comfort!} key={introKeys.comfort!} /></p>
-
-		<ComfortPanel />
-
-	{:else if currentStep.id === 'summary'}
-
-		<p><BiText fr={introFr.summary!} key={introKeys.summary!} /></p>
-
+<section class="card discovery-tabs" aria-labelledby="discovery-tabs-heading">
+	<div class="discovery-heading">
+		<h2 id="discovery-tabs-heading">Onglets utiles à tester</h2>
 		<p>
-
-			<BiText
-
-				fr="Consultez Mon profil pour voir vos besoins et aménagements. Exportez une synthèse PDF ou JSON depuis Paramètres."
-
-				key="onboard.discovery.step.summary.detail"
-
-			/>
-
+			Activez seulement les zones qui peuvent vous servir. Ouvrez un module pour le tester,
+			enregistrez si besoin, puis revenez ici.
 		</p>
+	</div>
 
-		<div class="discovery-links">
-
-			<a class="btn btn-secondary" href="/profil">Mon profil</a>
-
-			<a class="btn btn-secondary" href="/parametres#export">Exporter ma synthèse</a>
-
-		</div>
-
-	{:else if currentStep.id === 'sensory'}
-
-		<p><BiText fr={introFr.sensory!} key={introKeys.sensory!} /></p>
-
-		<ComfortPanel />
-
-	{:else if currentStep.id === 'media'}
-
-		<p><BiText fr={introFr.media!} key={introKeys.media!} /></p>
-
-		<MediaReaderPanel />
-
-	{:else if currentStep.implemented && 'href' in currentStep && currentStep.href}
-
-		<p><BiText fr={introFr[currentStep.id]!} key={introKeys[currentStep.id]!} /></p>
-
-		<a class="btn btn-secondary" href={currentStep.href}>{openModuleLabel.primary}</a>
-
-	{:else}
-
-		<p><BiText fr={introFr[currentStep.id]!} key={introKeys[currentStep.id]!} /></p>
-
-		<p><BiText fr="Vous pouvez passer cette étape ou revenir plus tard." key="onboard.discovery.stub.hint" /></p>
-
-	{/if}
-
+	<div class="discovery-tab-grid">
+		{#each discoveryTabs as tab}
+			{@const label = bilingualUi(tab.label, tab.key, $settings.ui)}
+			{@const active = isDiscoveryTabActive(tab)}
+			<div class="discovery-tab" class:discovery-tab--active={active}>
+				<div class="discovery-tab-copy">
+					<strong>
+						<BilingualText primary={label.primary} secondary={label.secondary} inline />
+					</strong>
+					<small>{tab.hint}</small>
+				</div>
+				<div class="discovery-tab-actions">
+					<button
+						type="button"
+						class="btn"
+						class:btn-primary={active}
+						class:btn-secondary={!active}
+						aria-pressed={active}
+						onclick={() => toggleDiscoveryTab(tab)}
+					>
+						{active ? 'Désactiver' : 'Activer'}
+					</button>
+					<a class="btn btn-secondary" href={tab.href}>Tester</a>
+				</div>
+			</div>
+		{/each}
+	</div>
 </section>
 
-
-
 <div class="onboarding-actions">
-
-	{#if stepIndex > 0}
-
-		<button type="button" class="btn btn-secondary" onclick={() => (stepIndex -= 1)}>Retour</button>
-
-	{:else}
-
-		<a class="btn btn-secondary" href="/onboarding">Retour</a>
-
-	{/if}
-
-	<button type="button" class="btn btn-secondary" onclick={skip}>Passer cette étape</button>
-
-	<button type="button" class="btn btn-secondary" onclick={skip}>Je ne sais pas</button>
-
-	<button type="button" class="btn btn-primary" onclick={() => next()}>
-
-		{stepIndex >= total - 1 ? 'Terminer' : 'Continuer'}
-
+	<a class="btn btn-secondary" href="/onboarding">Retour au choix du parcours</a>
+	<button type="button" class="btn btn-primary" onclick={finishDiscovery}>
+		Enregistrer et terminer
 	</button>
-
 </div>
 
-
-
 <style>
+	.discovery-tabs {
+		display: grid;
+		gap: var(--space-lg);
+	}
+
+	.discovery-heading p {
+		margin: 0;
+		color: var(--color-text-muted);
+	}
+
+	.discovery-tab-grid {
+		display: grid;
+		gap: var(--space-sm);
+	}
+
+	.discovery-tab {
+		display: grid;
+		gap: var(--space-sm);
+		padding: var(--space-sm);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		background: var(--color-bg);
+	}
+
+	.discovery-tab--active {
+		border-color: var(--color-accent);
+		box-shadow: inset 0.25rem 0 0 var(--color-accent);
+	}
+
+	.discovery-tab-copy {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-xs);
+		min-width: 0;
+	}
+
+	.discovery-tab-copy small {
+		color: var(--color-text-muted);
+		font-size: var(--font-size-sm);
+	}
+
+	.discovery-tab-actions,
+	.onboarding-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm);
+	}
 
 	.onboarding-actions {
-
-		display: flex;
-
-		flex-wrap: wrap;
-
-		gap: var(--space-sm);
-
 		margin-top: var(--space-lg);
-
 	}
 
-
-
-	.discovery-links {
-
-		display: flex;
-
-		flex-wrap: wrap;
-
-		gap: var(--space-sm);
-
-		margin-top: var(--space-md);
-
+	@media (min-width: 48rem) {
+		.discovery-tab {
+			grid-template-columns: minmax(0, 1fr) auto;
+			align-items: center;
+		}
 	}
-
 </style>
-

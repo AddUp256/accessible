@@ -4,6 +4,7 @@
 	import FocusTimer from '$lib/components/organizer/FocusTimer.svelte';
 	import KanbanBoard from '$lib/components/organizer/KanbanBoard.svelte';
 	import MindMapPanel from '$lib/components/organizer/MindMapPanel.svelte';
+	import OnboardingTestReturn from '$lib/components/onboarding/OnboardingTestReturn.svelte';
 	import VisualRoutinesPanel from '$lib/components/organizer/VisualRoutinesPanel.svelte';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
@@ -140,6 +141,8 @@
 </p>
 
 
+
+<OnboardingTestReturn moduleLabel="Organiser" />
 
 <FocusTimer />
 

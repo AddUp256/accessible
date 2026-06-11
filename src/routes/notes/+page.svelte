@@ -2,6 +2,8 @@
 
 	import NoteCard from '$lib/components/notes/NoteCard.svelte';
 
+	import OnboardingTestReturn from '$lib/components/onboarding/OnboardingTestReturn.svelte';
+
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 
 	import BiText from '$lib/components/ui/BiText.svelte';
@@ -173,6 +175,8 @@
 </p>
 
 
+
+<OnboardingTestReturn moduleLabel="Notes" />
 
 <section class="card note-editor" aria-labelledby="editor-heading">
 

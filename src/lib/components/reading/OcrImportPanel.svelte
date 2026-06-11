@@ -19,6 +19,24 @@
 	let busy = $state(false);
 	let previewUrl = $state<string | null>(null);
 	let tesseractReady = $state<boolean | null>(null);
+	const browserOcrAvailable = $derived(!isTauriRuntime() && ocr.isAvailable());
+	const tesseractLangByUi: Record<string, string> = {
+		ar: 'ara',
+		de: 'deu',
+		en: 'eng',
+		es: 'spa',
+		hi: 'hin',
+		it: 'ita',
+		pt: 'por',
+		tr: 'tur',
+		uk: 'ukr',
+		zh: 'chi_sim'
+	};
+	const ocrLang = $derived(
+		$settings.ui.bilingualUi && tesseractLangByUi[$settings.ui.secondaryLanguage]
+			? `fra+${tesseractLangByUi[$settings.ui.secondaryLanguage]}`
+			: 'fra'
+	);
 
 	const unavailableReason = $derived(
 		ocr.getUnavailableReason()
@@ -55,7 +73,7 @@
 		status = dynamicMessage('dyn.read.ocrAnalyzing', $settings.ui);
 
 		try {
-			const result = await ocr.extractText(file);
+			const result = await ocr.extractText(file, { lang: ocrLang });
 			if (result.ok) {
 				status = dynamicMessage('dyn.read.ocrExtracted', $settings.ui);
 				ontextimported?.(result.text);
@@ -87,6 +105,11 @@
 				key="mod.read.ocr.tesseractMissing"
 				inline
 			/>
+		{:else if browserOcrAvailable}
+			{' '}
+			<span class="ocr-inline-note">
+				OCR image disponible dans le navigateur. Le premier lancement peut prendre un moment.
+			</span>
 		{/if}
 	</p>
 	<label class="ocr-label" for="ocr-file-input">
@@ -119,7 +142,7 @@
 		<figure class="ocr-preview">
 			<img src={previewUrl} alt="Aperçu du document importé" />
 			<figcaption>
-				{#if tesseractReady === true}
+				{#if tesseractReady === true || browserOcrAvailable}
 					{dynamicMessage('dyn.read.ocrPreviewTesseract', $settings.ui)}
 				{:else}
 					{dynamicMessage('dyn.read.ocrPreviewManual', $settings.ui)}
@@ -180,5 +203,10 @@
 
 	.ocr-status--info {
 		color: var(--color-text-muted);
+	}
+
+	.ocr-inline-note {
+		color: var(--color-text);
+		font-weight: 600;
 	}
 </style>

@@ -598,7 +598,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
 	},
 	writing: {
 		spellcheck: 'step_by_step',
-		grammarCheck: 'off',
+		grammarCheck: 'step_by_step',
 		wordPrediction: false,
 		readBack: false,
 		distractionFree: false,

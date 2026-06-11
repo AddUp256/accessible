@@ -11,11 +11,123 @@ import {
 
 import { DYNAMIC_FR } from '$lib/i18n/ui-dynamic';
 
-import type { CorrecteurOptions, CorrecteurResult, CorrecteurService } from './types';
+import type { CorrecteurOptions, CorrecteurResult, CorrecteurService, SpellingIssue } from './types';
 
 const WEB_STUB_REASON = DYNAMIC_FR['dyn.service.correcteurWebStub'];
 const HUNSPELL_INSTALL_REASON = DYNAMIC_FR['dyn.service.hunspellMissing'];
 const GRAMMALECTE_INSTALL_REASON = DYNAMIC_FR['dyn.service.grammalecteMissing'];
+
+const LOCAL_SPELLING_RULES: {
+	pattern: RegExp;
+	message: string;
+	suggestion: string;
+}[] = [
+	{
+		pattern: /\b[Bb]oujour\b/g,
+		message: 'Mot probablement mal orthographié : « Boujour ».',
+		suggestion: 'Bonjour'
+	},
+	{
+		pattern: /\b[Vv]ou\b/g,
+		message: 'Mot probablement incomplet : « vou ».',
+		suggestion: 'vous'
+	},
+	{
+		pattern: /\b[Tt]ousse\b/g,
+		message: 'Mot probablement mal orthographié : « tousse ».',
+		suggestion: 'tous'
+	},
+	{
+		pattern: /\b[Ss]a va\b/g,
+		message: 'Confusion fréquente entre « sa » et « ça ».',
+		suggestion: 'ça va'
+	},
+	{
+		pattern: /\b[Cc]a va\b/g,
+		message: 'Il manque probablement la cédille.',
+		suggestion: 'ça va'
+	},
+	{
+		pattern: /\b[Ss]il vous plait\b/g,
+		message: 'Accent recommandé dans cette formule.',
+		suggestion: "s'il vous plaît"
+	}
+];
+
+const LOCAL_GRAMMAR_RULES: {
+	pattern: RegExp;
+	message: string;
+	suggestion: string;
+}[] = [
+	{
+		pattern: /\b[Cc]omment\s+all[ée]?\s+vou?s?\b/g,
+		message: 'Formulation probable : « comment allez-vous ».',
+		suggestion: 'comment allez-vous'
+	},
+	{
+		pattern: /\b[Jj]e\s+vous\s+remerci\b/g,
+		message: 'Le verbe remercier prend généralement « e » ici.',
+		suggestion: 'je vous remercie'
+	},
+	{
+		pattern: /\b[Ii]l\s+faut\s+que\s+je\s+vais\b/g,
+		message: 'Après « il faut que », on attend souvent le subjonctif.',
+		suggestion: "il faut que j'aille"
+	}
+];
+
+function preserveInitialCase(source: string, suggestion: string): string {
+	if (!source[0] || source[0] !== source[0].toUpperCase()) return suggestion;
+	return suggestion[0].toUpperCase() + suggestion.slice(1);
+}
+
+function localIssuesFromRules(
+	text: string,
+	rules: typeof LOCAL_SPELLING_RULES,
+	kind: 'spelling' | 'grammar'
+): SpellingIssue[] {
+	return rules.flatMap((rule) =>
+		Array.from(text.matchAll(rule.pattern)).map((match) => ({
+			kind,
+			message: rule.message,
+			offset: match.index ?? 0,
+			length: match[0].length,
+			suggestion: preserveInitialCase(match[0], rule.suggestion)
+		}))
+	);
+}
+
+function findLocalSpellingIssues(text: string) {
+	const issues: SpellingIssue[] = localIssuesFromRules(text, LOCAL_SPELLING_RULES, 'spelling');
+	const trimmedEnd = text.trimEnd();
+	const firstLetter = text.match(/[A-Za-zÀ-ÖØ-öø-ÿ]/);
+
+	if (firstLetter && firstLetter[0] === firstLetter[0].toLowerCase()) {
+		issues.unshift({
+			kind: 'punctuation',
+			message: 'La phrase commence probablement par une majuscule.',
+			offset: firstLetter.index ?? 0,
+			length: 1,
+			suggestion: firstLetter[0].toUpperCase()
+		});
+	}
+
+	if (trimmedEnd && !/[.!?…]$/.test(trimmedEnd)) {
+		issues.push({
+			kind: 'punctuation',
+			message: 'Une ponctuation finale peut aider à lire la phrase.',
+			offset: trimmedEnd.length,
+			length: 0,
+			suggestion: '.'
+		});
+	}
+
+	return issues;
+}
+
+function findLocalGrammarIssues(text: string) {
+	return localIssuesFromRules(text, LOCAL_GRAMMAR_RULES, 'grammar');
+}
 
 class StubCorrecteurService implements CorrecteurService {
 	isAvailable() {
@@ -52,6 +164,44 @@ class StubCorrecteurService implements CorrecteurService {
 		}
 
 		return { ok: false, error: WEB_STUB_REASON };
+	}
+}
+
+class WebCorrecteurService implements CorrecteurService {
+	isAvailable() {
+		return browser;
+	}
+
+	getUnavailableReason() {
+		return null;
+	}
+
+	getGrammarUnavailableReason() {
+		return null;
+	}
+
+	async analyze(text: string, options: CorrecteurOptions = {}): Promise<CorrecteurResult> {
+		if (options.mode === 'off') {
+			return { ok: true, issues: [], engine: 'local' };
+		}
+
+		if (!text.trim()) {
+			return { ok: false, error: 'Aucun texte à corriger.' };
+		}
+
+		return { ok: true, issues: findLocalSpellingIssues(text), engine: 'local' };
+	}
+
+	async analyzeGrammar(text: string, options: CorrecteurOptions = {}): Promise<CorrecteurResult> {
+		if (options.mode === 'off') {
+			return { ok: true, issues: [], engine: 'local' };
+		}
+
+		if (!text.trim()) {
+			return { ok: false, error: 'Aucun texte à corriger.' };
+		}
+
+		return { ok: true, issues: findLocalGrammarIssues(text), engine: 'local' };
 	}
 }
 
@@ -138,6 +288,7 @@ function createCorrecteurService(): CorrecteurService {
 	if (browser && isTauriRuntime()) {
 		return new TauriCorrecteurService();
 	}
+	if (browser) return new WebCorrecteurService();
 	return new StubCorrecteurService();
 }
 

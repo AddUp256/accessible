@@ -1,5 +1,6 @@
 <script lang="ts">
 	import InstructionAnalyzer from '$lib/components/comprehension/InstructionAnalyzer.svelte';
+	import OnboardingTestReturn from '$lib/components/onboarding/OnboardingTestReturn.svelte';
 	import PersonalGlossaryPanel from '$lib/components/comprehension/PersonalGlossaryPanel.svelte';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
@@ -26,6 +27,8 @@
 <p class="understand-note">
 	<BiText fr="Glossaire personnel et simplification FALC disponibles ci-dessous." key="mod.understand.note" />
 </p>
+
+<OnboardingTestReturn moduleLabel="Comprendre" />
 
 <section class="card instruction-input" aria-labelledby="input-heading">
 	<BiHeading fr="Votre consigne" key="mod.understand.input.title" level={3} id="input-heading" />

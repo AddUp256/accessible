@@ -4,12 +4,14 @@
 	import ReadingControls from '$lib/components/reading/ReadingControls.svelte';
 	import ReadingPane from '$lib/components/reading/ReadingPane.svelte';
 	import OcrImportPanel from '$lib/components/reading/OcrImportPanel.svelte';
+	import OnboardingTestReturn from '$lib/components/onboarding/OnboardingTestReturn.svelte';
 	import ExplainAgainPanel from '$lib/components/comprehension/ExplainAgainPanel.svelte';
 	import ReadAloudButton from '$lib/components/ui/ReadAloudButton.svelte';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import { FONT_COMPARE_SAMPLES } from '$lib/config/fonts-catalog';
 	import { configLabel } from '$lib/i18n';
+	import { saveReadingPreferences } from '$lib/modules/reading/preferences';
 	import { profileStore, settings } from '$lib/stores/profile';
 	import { isVerySimpleDetail } from '$lib/utils/detail-level';
 	import { isLireSubTabVisible } from '$lib/modules/profile/feature-visibility';
@@ -103,6 +105,8 @@
 
 <BiHeading fr="Lire un texte" key="page.read.title" />
 <p><BiText fr="Collez un texte ou utilisez l'exemple. Changez les réglages et enregistrez vos préférences." key="page.read.intro" /></p>
+
+<OnboardingTestReturn moduleLabel="Lire" onSave={() => saveReadingPreferences()} />
 
 <div class="lire-tabs" role="tablist" aria-label="Modes de lecture">
 	<button

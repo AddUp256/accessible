@@ -4,6 +4,15 @@ Ce guide est destiné aux utilisateurs, testeurs, services informatiques et pers
 
 Accessible fonctionne en local. Les fonctions principales ne demandent pas de compte et ne nécessitent pas internet. Certains moteurs externes sont optionnels : OCR, traitement audio/vidéo et synthèse vocale locale.
 
+## Version navigateur rapide
+
+1. Ouvrir <https://addup256.github.io/accessible/>.
+2. Autoriser l’audio si le navigateur le demande.
+3. Lire le message d’introduction.
+4. Lancer la personnalisation pour garder seulement les fonctions utiles.
+
+La version navigateur est pratique pour tester ou utiliser rapidement Accessible sans installation. Elle prend en charge les réglages, les notes, les exports, la synthèse vocale Web Speech, l’aide locale à la correction et l’OCR image via Tesseract.js. L’OCR PDF, Hunspell, Grammalecte, Piper et eSpeak NG restent prévus pour l’application installée.
+
 ## Choisir le bon fichier
 
 1. Ouvrir la page des releases : <https://github.com/AddUp256/accessible/releases>.
@@ -50,7 +59,7 @@ Les premières versions peuvent ne pas être signées. Windows SmartScreen ou ma
 Depuis le dossier du projet, un script installe automatiquement les moteurs les plus courants avec Winget :
 
 ```powershell
-powershell -ExecutionPolicy Bypass -NoProfile -File scripts\install-windows-optional-tools.ps1
+powershell -NoProfile -File .\scripts\install-windows-optional-tools.ps1
 ```
 
 Le script tente d’installer :
@@ -62,6 +71,14 @@ Le script tente d’installer :
 | eSpeak NG | Synthèse vocale locale légère |
 
 Après installation, redémarrer Accessible. Si un moteur n’est pas détecté, redémarrer Windows ou vérifier que son dossier est dans le `PATH`.
+
+Si PowerShell bloque l’exécution du script, lancer les installations une par une depuis PowerShell :
+
+```powershell
+winget install --id UB-Mannheim.TesseractOCR --exact --source winget
+winget install --id Gyan.FFmpeg --exact --source winget
+winget install --id eSpeak-NG.eSpeak-NG --exact --source winget
+```
 
 ## Dépendances optionnelles macOS et Linux
 

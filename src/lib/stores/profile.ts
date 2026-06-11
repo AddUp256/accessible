@@ -6,7 +6,6 @@ import {
 	activateStoredProfile,
 	clearStoredProfile,
 	loadProfile,
-	saveProfile,
 	saveProfileAsync
 } from '$lib/services/storage/local';
 import { isTauriRuntime } from '$lib/services/storage/tauri';
@@ -31,6 +30,11 @@ function touchProfile(profile: AccessibleProfile): AccessibleProfile {
 	};
 }
 
+function cloneProfileForSave(profile: AccessibleProfile): AccessibleProfile {
+	if (typeof structuredClone === 'function') return structuredClone(profile);
+	return JSON.parse(JSON.stringify(profile)) as AccessibleProfile;
+}
+
 function createProfileStore() {
 	const { subscribe, set, update } = writable<AccessibleProfile>(
 		browser ? loadProfile() : createDefaultProfile()
@@ -38,6 +42,17 @@ function createProfileStore() {
 
 	let persistEnabled = true;
 	let storageHydrated = !browser || !isTauriRuntime();
+	let saveQueue: Promise<void> = Promise.resolve();
+
+	function enqueueProfileSave(profile: AccessibleProfile): void {
+		const snapshot = cloneProfileForSave(profile);
+		saveQueue = saveQueue
+			.catch(() => undefined)
+			.then(() => saveProfileAsync(snapshot))
+			.catch((error) => {
+				console.warn('Impossible de sauvegarder le profil Accessible.', error);
+			});
+	}
 
 	if (browser) {
 		subscribe((profile) => {
@@ -50,7 +65,7 @@ function createProfileStore() {
 			) {
 				return;
 			}
-			saveProfile(profile);
+			enqueueProfileSave(profile);
 		});
 	}
 
@@ -72,7 +87,7 @@ function createProfileStore() {
 			persistEnabled = false;
 			set(fresh);
 			persistEnabled = true;
-			if (browser) saveProfile(fresh);
+			if (browser) enqueueProfileSave(fresh);
 		},
 		deleteAllData: () => {
 			clearStoredProfile();
@@ -91,7 +106,7 @@ function createProfileStore() {
 			set(profile);
 			persistEnabled = true;
 			storageHydrated = true;
-			if (browser && !profile.privacy.guestMode) saveProfile(profile);
+			if (browser && !profile.privacy.guestMode) enqueueProfileSave(profile);
 		},
 		switchProfile: async (profileId: string) => {
 			const current = get({ subscribe });

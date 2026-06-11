@@ -4,6 +4,8 @@
 
 	import CommunicationCardGrid from '$lib/components/communicator/CommunicationCardGrid.svelte';
 
+	import OnboardingTestReturn from '$lib/components/onboarding/OnboardingTestReturn.svelte';
+
 	import PersonalCardsPanel from '$lib/components/communicator/PersonalCardsPanel.svelte';
 
 	import ScenarioPlayer from '$lib/components/communicator/ScenarioPlayer.svelte';
@@ -106,6 +108,8 @@
 </p>
 
 
+
+<OnboardingTestReturn moduleLabel="Communiquer" />
 
 <section class="card scenarios" aria-labelledby="social-scenarios-heading">
 

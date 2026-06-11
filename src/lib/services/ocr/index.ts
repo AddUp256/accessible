@@ -1,6 +1,8 @@
 import { browser } from '$app/environment';
+import { get } from 'svelte/store';
 
 import { isTauriRuntime } from '$lib/services/storage/tauri';
+import { settings } from '$lib/stores/profile';
 
 import { tauriIsTesseractAvailable, tauriOcrExtractText } from './tauri';
 
@@ -13,6 +15,8 @@ import { OCR_ACCEPTED_IMAGE_TYPES } from './types';
 const WEB_STUB_REASON = DYNAMIC_FR['dyn.service.ocrWebStub'];
 const TESSERACT_INSTALL_REASON = DYNAMIC_FR['dyn.service.ocrTesseractMissing'];
 const PDF_WEB_STUB_REASON = DYNAMIC_FR['dyn.service.ocrPdfWebStub'];
+const WEB_OCR_INTERNET_REASON =
+	"L'OCR image du navigateur doit pouvoir charger son moteur au premier lancement. Activez Internet ou utilisez l'application installée.";
 
 function detectSourceKind(file: File): OcrSourceKind | null {
 	if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
@@ -59,6 +63,63 @@ class StubOcrService implements OcrService {
 		}
 
 		return { ok: false, error: WEB_STUB_REASON, sourceKind: 'image' };
+	}
+}
+
+class WebOcrService implements OcrService {
+	isAvailable() {
+		return browser;
+	}
+
+	getUnavailableReason() {
+		if (!browser) return WEB_STUB_REASON;
+		if (get(settings).ui.internetEnabled === false) return WEB_OCR_INTERNET_REASON;
+		return null;
+	}
+
+	async extractText(file: File, options: OcrOptions = {}): Promise<OcrResult> {
+		const sourceKind = detectSourceKind(file);
+
+		if (!sourceKind) {
+			return {
+				ok: false,
+				error: 'Format non pris en charge. Utilisez une image (JPG, PNG…) ou un PDF.'
+			};
+		}
+
+		if (sourceKind === 'pdf') {
+			return { ok: false, error: PDF_WEB_STUB_REASON, sourceKind: 'pdf' };
+		}
+
+		if (get(settings).ui.internetEnabled === false) {
+			return { ok: false, error: WEB_OCR_INTERNET_REASON, sourceKind: 'image' };
+		}
+
+		let worker: Awaited<ReturnType<(typeof import('tesseract.js'))['createWorker']>> | null = null;
+		try {
+			const { createWorker } = await import('tesseract.js');
+			worker = await createWorker(options.lang ?? 'fra');
+			const result = await worker.recognize(file);
+			const text = result.data.text.trim();
+
+			if (!text) {
+				return {
+					ok: false,
+					error: "Aucun texte détecté dans l'image.",
+					sourceKind
+				};
+			}
+
+			return { ok: true, text, sourceKind };
+		} catch (error) {
+			const message =
+				error instanceof Error
+					? error.message
+					: "Impossible de lancer l'OCR image dans le navigateur.";
+			return { ok: false, error: message, sourceKind };
+		} finally {
+			await worker?.terminate().catch(() => undefined);
+		}
 	}
 }
 
@@ -126,10 +187,12 @@ function createOcrService(): OcrService {
 		return new TauriOcrService();
 	}
 
+	if (browser) return new WebOcrService();
+
 	return new StubOcrService();
 }
 
-/** Web Speech stub ou Tesseract via Tauri. */
+/** Tesseract.js dans le navigateur, Tesseract système via Tauri, ou stub SSR. */
 export const ocr: OcrService = createOcrService();
 
 export {

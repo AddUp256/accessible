@@ -60,6 +60,13 @@
 		tts.stop();
 		ttsStatus = '';
 	}
+
+	function setButtonSize(buttonSize: UISettings['buttonSize']) {
+		profileStore.updateSettings({
+			ui: { buttonSize },
+			motor: { largeButtons: buttonSize === 'veryLarge' }
+		});
+	}
 </script>
 
 <div class="comfort-panel">
@@ -89,7 +96,7 @@
 					class="btn"
 					class:btn-primary={$settings.ui.buttonSize === size.value}
 					class:btn-secondary={$settings.ui.buttonSize !== size.value}
-					onclick={() => profileStore.updateSettings({ ui: { buttonSize: size.value } })}
+					onclick={() => setButtonSize(size.value)}
 				>
 					{bilingualLabel(size.fr, size.key, $settings.ui)}
 				</button>

@@ -36,7 +36,41 @@ const PIPER_STUB_REASON = DYNAMIC_FR['dyn.service.ttsPiperStub'];
 
 const ESPEAK_STUB_REASON = DYNAMIC_FR['dyn.service.ttsEspeakStub'];
 
+const LOCAL_AUDIO_PRIME_MS = 160;
+const WEB_SPEECH_START_DELAY_MS = 180;
+
 const AUDIO_DISABLED_REASON = 'Audio désactivé dans Accessible.';
+
+function delay(ms: number): Promise<void> {
+	return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function waitForAudioReady(audio: HTMLAudioElement): Promise<void> {
+	if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) return Promise.resolve();
+
+	return new Promise((resolve, reject) => {
+		const cleanup = () => {
+			audio.removeEventListener('canplay', onReady);
+			audio.removeEventListener('canplaythrough', onReady);
+			audio.removeEventListener('loadeddata', onReady);
+			audio.removeEventListener('error', onError);
+		};
+		const onReady = () => {
+			cleanup();
+			resolve();
+		};
+		const onError = () => {
+			cleanup();
+			reject(new Error('Impossible de préparer le fichier audio synthétisé.'));
+		};
+
+		audio.addEventListener('canplay', onReady, { once: true });
+		audio.addEventListener('canplaythrough', onReady, { once: true });
+		audio.addEventListener('loadeddata', onReady, { once: true });
+		audio.addEventListener('error', onError, { once: true });
+		audio.load();
+	});
+}
 
 
 
@@ -105,6 +139,8 @@ class StubTTSService implements TTSService {
 class WebSpeechTTSService implements TTSService {
 
 	private utterance: SpeechSynthesisUtterance | null = null;
+	private primed = false;
+	private primedVoiceUri = '';
 
 
 
@@ -219,10 +255,45 @@ class WebSpeechTTSService implements TTSService {
 
 		this.utterance = utterance;
 
-		speechSynthesis.speak(utterance);
+		this.speakPreparedUtterance(utterance, options.voiceUri ?? '');
 
 		return true;
 
+	}
+
+	private speakPreparedUtterance(utterance: SpeechSynthesisUtterance, voiceUri: string) {
+		if (!browser || !('speechSynthesis' in window)) return;
+
+		const speakAfterDelay = () => {
+			window.setTimeout(() => {
+				if (this.utterance !== utterance) return;
+				speechSynthesis.resume();
+				speechSynthesis.speak(utterance);
+			}, WEB_SPEECH_START_DELAY_MS);
+		};
+
+		if (this.primed && this.primedVoiceUri === voiceUri) {
+			speakAfterDelay();
+			return;
+		}
+
+		const warmup = new SpeechSynthesisUtterance('.');
+		warmup.lang = utterance.lang;
+		warmup.rate = 1;
+		warmup.volume = 0.01;
+		warmup.onend = () => {
+			this.primed = true;
+			this.primedVoiceUri = voiceUri;
+			speakAfterDelay();
+		};
+		warmup.onerror = () => {
+			this.primed = true;
+			this.primedVoiceUri = voiceUri;
+			speakAfterDelay();
+		};
+
+		if (utterance.voice) warmup.voice = utterance.voice;
+		speechSynthesis.speak(warmup);
 	}
 
 
@@ -375,6 +446,21 @@ export class TauriTTSService implements TTSService {
 
 	}
 
+	private async primeAudio(audio: HTMLAudioElement): Promise<void> {
+		await waitForAudioReady(audio);
+
+		const wasMuted = audio.muted;
+		audio.muted = true;
+		try {
+			await audio.play();
+			await delay(LOCAL_AUDIO_PRIME_MS);
+			audio.pause();
+			audio.currentTime = 0;
+		} finally {
+			audio.muted = wasMuted;
+		}
+	}
+
 
 
 	speak(text: string, options: TTSOptions = {}) {
@@ -479,6 +565,12 @@ export class TauriTTSService implements TTSService {
 
 				// Fall back to the system output when the selected device is unavailable.
 
+			}
+
+			try {
+				await this.primeAudio(audio);
+			} catch {
+				// If priming is blocked, try the audible playback path anyway.
 			}
 
 

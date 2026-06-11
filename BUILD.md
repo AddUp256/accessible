@@ -108,6 +108,13 @@ Deux workflows sont fournis :
 
 - `.github/workflows/ci.yml` : vérifie `npm ci` et `npm run smoke` sur les pushes et pull requests.
 - `.github/workflows/release.yml` : construit les artefacts desktop quand un tag `v*.*.*` est poussé, ou via lancement manuel.
+- `.github/workflows/pages.yml` : publie la version navigateur sur GitHub Pages à chaque push sur `main`.
+
+Pour tester localement le build GitHub Pages :
+
+```bash
+GITHUB_PAGES=true npm run build
+```
 
 Pour déclencher une release :
 

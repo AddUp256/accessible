@@ -27,12 +27,29 @@ export function resetPersonalizationJourney() {
 	}));
 }
 
-export function setOnboardingPath(path: NonNullable<OnboardingState['path']>) {
-	resetPersonalizationJourney();
-	profileStore.patch((p) => ({
-		...p,
-		onboarding: { ...p.onboarding, path, completedSteps: [], comparisons: [] }
-	}));
+export function setOnboardingPath(
+	path: NonNullable<OnboardingState['path']>,
+	options: { reset?: boolean } = {}
+) {
+	const reset = options.reset ?? true;
+	profileStore.patch((p) => {
+		if (!reset && p.onboarding.path === path) return p;
+
+		return {
+			...p,
+			activatedTools: reset ? [] : p.activatedTools,
+			functionalProfiles: reset ? createEmptyFunctionalProfiles() : p.functionalProfiles,
+			declaredProfiles: reset
+				? {
+						medicalOrAdministrative: [],
+						visibleInExports: p.declaredProfiles.visibleInExports
+					}
+				: p.declaredProfiles,
+			onboarding: reset
+				? { ...p.onboarding, path, completedSteps: [], comparisons: [] }
+				: { ...p.onboarding, path }
+		};
+	});
 }
 
 export function completeOnboardingStep(stepId: string) {

@@ -11,8 +11,9 @@
 	let { children }: { children: import('svelte').Snippet } = $props();
 
 	const routeFeature = $derived(featureFromPath($page.url.pathname));
+	const discoveryTestMode = $derived($page.url.searchParams.get('from') === 'discovery');
 	const routeAllowed = $derived(
-		routeFeature === null || isFeatureVisible($profileStore, routeFeature)
+		routeFeature === null || discoveryTestMode || isFeatureVisible($profileStore, routeFeature)
 	);
 </script>
 

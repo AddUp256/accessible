@@ -226,6 +226,9 @@
 			{unavailableReasonDisplay}
 		{:else if grammarActive && grammarUnavailableReasonDisplay && !spellcheckActive}
 			{grammarUnavailableReasonDisplay}
+		{:else if !isTauriRuntime()}
+			Dans le navigateur : aide locale rapide (fautes fréquentes, ponctuation, phrases longues).
+			Hunspell et Grammalecte restent disponibles dans l'application installée.
 		{:else}
 			<BiText
 				fr="Orthographe (Hunspell), grammaire (Grammalecte) et phrases longues."

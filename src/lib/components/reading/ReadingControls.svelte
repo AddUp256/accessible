@@ -46,7 +46,7 @@
 	);
 
 	const showVoicePicker = $derived(
-		$settings.reading.tts && speechVoices.length > 0 && (tts.isAvailable() || expert)
+		speechVoices.length > 0 && (tts.isAvailable() || expert)
 	);
 
 	const showPiperVoicePicker = $derived(

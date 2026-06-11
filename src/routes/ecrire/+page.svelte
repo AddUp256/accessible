@@ -1,6 +1,7 @@
 <script lang="ts">
 
 	import CorrecteurPanel from '$lib/components/writing/CorrecteurPanel.svelte';
+	import OnboardingTestReturn from '$lib/components/onboarding/OnboardingTestReturn.svelte';
 	import WritingControls from '$lib/components/writing/WritingControls.svelte';
 	import WritingEditor from '$lib/components/writing/WritingEditor.svelte';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
@@ -29,6 +30,8 @@
 </p>
 
 
+
+<OnboardingTestReturn moduleLabel="Écrire" />
 
 <div class="ecrire-layout" class:ecrire-layout--distraction={$settings.writing.distractionFree}>
 

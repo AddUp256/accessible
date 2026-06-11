@@ -26,6 +26,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.15rem;
+		min-width: 0;
+		max-width: 100%;
 	}
 
 	.bilingual-text--inline {
@@ -39,11 +41,22 @@
 		font-size: 0.92em;
 		color: var(--color-text-muted);
 		font-weight: 500;
+		overflow-wrap: anywhere;
+	}
+
+	.bilingual-primary {
+		overflow-wrap: anywhere;
 	}
 
 	.bilingual-text--inline .bilingual-secondary::before {
 		content: '·';
 		margin-right: 0.35rem;
 		color: var(--color-text-muted);
+	}
+
+	:global(.btn-primary) .bilingual-secondary,
+	:global(.btn-primary) .bilingual-secondary::before {
+		color: currentColor;
+		opacity: 0.92;
 	}
 </style>

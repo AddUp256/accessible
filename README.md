@@ -7,6 +7,7 @@ Application locale, légère et utilisable hors connexion pour adapter son envir
 ## Télécharger et installer
 
 Les versions prêtes à installer seront publiées dans les **GitHub Releases** du projet.
+La version navigateur est publiée par GitHub Pages : <https://addup256.github.io/accessible/>.
 
 | Système | Fichier conseillé | Compatibilité annoncée |
 |---------|-------------------|------------------------|

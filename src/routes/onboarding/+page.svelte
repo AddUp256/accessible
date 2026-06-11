@@ -73,7 +73,7 @@
 				<strong>
 					<BilingualText primary={title.primary} secondary={title.secondary} inline />
 				</strong>
-				<span>
+				<span class="onboarding-choice-desc">
 					<BilingualText primary={desc.primary} secondary={desc.secondary} inline />
 				</span>
 			</a>
@@ -98,10 +98,13 @@
 		align-items: flex-start;
 		text-align: left;
 		gap: var(--space-xs);
+		width: 100%;
 	}
 
-	.onboarding-choice span {
+	.onboarding-choice-desc {
 		font-weight: 400;
 		font-size: var(--font-size-sm);
+		color: currentColor;
+		opacity: 0.95;
 	}
 </style>
