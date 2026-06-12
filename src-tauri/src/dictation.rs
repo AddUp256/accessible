@@ -1,9 +1,9 @@
-use std::process::{Command, Stdio};
-
 use serde::Serialize;
 
 #[cfg(windows)]
 use std::os::windows::process::CommandExt;
+#[cfg(windows)]
+use std::process::{Command, Stdio};
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

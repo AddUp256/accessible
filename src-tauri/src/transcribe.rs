@@ -274,7 +274,7 @@ fn resolve_whisper_model() -> Result<PathBuf, String> {
 }
 
 fn default_whisper_model() -> Option<PathBuf> {
-    let mut model_dirs = Vec::new();
+    let mut model_dirs: Vec<PathBuf> = Vec::new();
 
     #[cfg(windows)]
     {

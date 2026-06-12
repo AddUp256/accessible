@@ -42,10 +42,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
           cache: npm
@@ -81,6 +81,9 @@ jobs:
 
       - name: Validate project before packaging
         run: npm run check && npm run validate:lang-packs
+
+      - name: Check Rust backend before packaging
+        run: cargo check --manifest-path src-tauri/Cargo.toml
 
       - name: Configure macOS ad-hoc signing when no certificate secret is provided
         if: startsWith(matrix.platform, 'macos')

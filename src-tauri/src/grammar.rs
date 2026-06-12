@@ -144,7 +144,7 @@ fn find_file_named(root: &Path, filename: &str, depth: usize) -> Option<PathBuf>
 }
 
 fn grammalecte_cli_candidates() -> Vec<PathBuf> {
-    let mut candidates = Vec::new();
+    let mut candidates: Vec<PathBuf> = Vec::new();
 
     #[cfg(windows)]
     {
