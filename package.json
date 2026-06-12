@@ -2,7 +2,7 @@
   "name": "accessible",
   "private": true,
   "description": "Application locale pour adapter la lecture, l'ecriture, l'organisation, la communication et le travail numerique.",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "license": "MIT",
   "repository": {
     "type": "git",
