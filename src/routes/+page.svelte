@@ -5,15 +5,12 @@
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import BilingualText from '$lib/components/ui/BilingualText.svelte';
-	import { dashboardActionsForMode } from '$lib/config/dashboard-actions';
 	import { ZONE_PICTOGRAMS } from '$lib/config/nav-pictograms';
 	import {
-		filterDashboardActions,
 		filterNavZones,
 		needsPersonalization
 	} from '$lib/modules/profile/feature-visibility';
-	import { getPluginActions } from '$lib/plugins';
-	import { bilingualDashboardAction, bilingualUi, type UiKey } from '$lib/i18n';
+	import { bilingualUi, type UiKey } from '$lib/i18n';
 	import { profileStore, settings } from '$lib/stores/profile';
 	import { isVerySimpleDetail } from '$lib/utils/detail-level';
 
@@ -35,13 +32,12 @@
 		'/communiquer': 'nav.communicate'
 	};
 
-	const pluginActions = $derived(getPluginActions());
 	const verySimple = $derived(isVerySimpleDetail($profileStore));
 	const visibleZones = $derived(filterNavZones($profileStore));
-	const dashboardActions = $derived(
-		filterDashboardActions($profileStore, dashboardActionsForMode(verySimple))
-	);
 	const shouldStartPersonalization = $derived(needsPersonalization($profileStore));
+	const shouldShowPersonalizationStart = $derived(
+		shouldStartPersonalization && !$settings.ui.firstLaunchIntroDismissed
+	);
 	const showPictograms = $derived($settings.ui.showPictograms || verySimple);
 	const welcomeSpeech = $derived(welcomeLines.map((line) => line.fr).join(' '));
 </script>
@@ -63,7 +59,7 @@
 <TeacherHomePanel />
 <ExpertHomePanel />
 
-{#if shouldStartPersonalization}
+{#if shouldShowPersonalizationStart}
 	<section class="personalization-start card" aria-labelledby="personalization-start-heading">
 		<BiHeading
 			fr="Commencer par personnaliser le parcours"
@@ -80,7 +76,7 @@
 			<BiText fr="Personnaliser mon parcours" key="home.personalization.start" inline />
 		</a>
 	</section>
-{:else}
+{:else if visibleZones.length > 0}
 	<section aria-labelledby="zones-heading">
 		<BiHeading fr="Les 5 zones" key="home.zones" id="zones-heading" />
 		<p><BiText fr="Choisissez une zone principale." key="home.zonesHint" /></p>
@@ -94,35 +90,6 @@
 					{/if}
 					<BilingualText primary={label.primary} secondary={label.secondary} inline />
 				</a>
-			{/each}
-		</div>
-	</section>
-
-	<section aria-labelledby="actions-heading">
-		<BiHeading fr="Actions rapides" key="home.actions" id="actions-heading" />
-		<div class="dashboard-actions">
-			{#each dashboardActions as action}
-				{@const bi = bilingualDashboardAction(action, $settings.ui)}
-				<a class="btn btn-secondary btn-lg card dashboard-action" href={action.href}>
-					<strong>
-						<BilingualText primary={bi.label.primary} secondary={bi.label.secondary} inline />
-					</strong>
-					<span class="dashboard-desc">
-						<BilingualText
-							primary={bi.description.primary}
-							secondary={bi.description.secondary}
-							inline
-						/>
-					</span>
-				</a>
-			{/each}
-			{#each pluginActions as action}
-				{#if !verySimple}
-					<a class="btn btn-secondary btn-lg card dashboard-action" href={action.href}>
-						<strong>{action.label}</strong>
-						<span class="dashboard-desc">{action.description}</span>
-					</a>
-				{/if}
 			{/each}
 		</div>
 	</section>
@@ -146,15 +113,4 @@
 		font-size: var(--font-size-lg);
 	}
 
-	.dashboard-action {
-		flex-direction: column;
-		align-items: flex-start;
-		text-align: left;
-		gap: var(--space-xs);
-	}
-
-	.dashboard-desc {
-		font-weight: 400;
-		font-size: var(--font-size-sm);
-	}
 </style>

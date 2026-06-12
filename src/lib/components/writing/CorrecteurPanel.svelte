@@ -237,6 +237,46 @@
 		{/if}
 	</p>
 
+	<details class="correcteur-install-guide">
+		<summary>Installer la correction avancée</summary>
+		<div class="install-guide-content">
+			<p>
+				Dans le navigateur, Accessible utilise une aide locale rapide. Pour la correction complète,
+				utilisez l'application installée avec Hunspell, le dictionnaire français et Grammalecte CLI.
+			</p>
+			<ul>
+				<li>
+					Hunspell :
+					<code>winget install --id FSFhu.Hunspell --exact --source winget</code>
+					ou la page
+					<a href="https://github.com/hunspell/hunspell" target="_blank" rel="noreferrer">
+						Hunspell
+					</a>.
+				</li>
+				<li>
+					Dictionnaire français <code>fr_FR</code> : installez le dictionnaire fourni par votre
+					distribution ou récupérez les fichiers <code>fr_FR.aff</code> et <code>fr_FR.dic</code>
+					depuis
+					<a
+						href="https://github.com/LibreOffice/dictionaries/tree/master/fr_FR"
+						target="_blank"
+						rel="noreferrer"
+					>
+						LibreOffice dictionaries
+					</a>.
+				</li>
+				<li>
+					Grammalecte :
+					<a href="https://grammalecte.net/" target="_blank" rel="noreferrer">
+						télécharger Grammalecte
+					</a>, puis indiquer le chemin du script CLI :
+					<code>setx GRAMMALECTE_CLI "C:\chemin\grammalecte-cli.py"</code>.
+				</li>
+			</ul>
+			<p>Après installation, fermez Accessible puis relancez-le pour rafraîchir la détection.</p>
+		</div>
+	</details>
+
 	<button
 		type="button"
 		class="btn btn-primary"
@@ -352,6 +392,41 @@
 		color: var(--color-text-muted);
 		font-size: var(--font-size-sm);
 		margin-bottom: var(--space-md);
+	}
+
+	.correcteur-install-guide {
+		margin: 0 0 var(--space-md);
+		padding: var(--space-sm) var(--space-md);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		background: var(--color-bg-elevated);
+	}
+
+	.correcteur-install-guide summary {
+		cursor: pointer;
+		font-weight: 700;
+	}
+
+	.install-guide-content {
+		margin-top: var(--space-sm);
+		font-size: var(--font-size-sm);
+		color: var(--color-text-muted);
+	}
+
+	.install-guide-content ul {
+		margin: var(--space-sm) 0;
+		padding-left: var(--space-lg);
+	}
+
+	.install-guide-content li + li {
+		margin-top: var(--space-sm);
+	}
+
+	.install-guide-content code {
+		display: inline-block;
+		max-width: 100%;
+		white-space: normal;
+		overflow-wrap: anywhere;
 	}
 
 	.spelling-issues,

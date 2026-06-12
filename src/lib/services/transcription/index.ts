@@ -34,7 +34,7 @@ class TauriTranscriptionService implements TranscriptionService {
 	private unavailableReason: string | null = null;
 
 	isAvailable() {
-		return browser && isTauriRuntime() && this.whisperReady === true;
+		return browser && isTauriRuntime() && this.whisperReady !== false;
 	}
 
 	getUnavailableReason() {

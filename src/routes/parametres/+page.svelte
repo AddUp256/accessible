@@ -3,6 +3,7 @@
 	import { get } from 'svelte/store';
 	import { settings, profileStore } from '$lib/stores/profile';
 	import { downloadProfileJson, downloadProfilePdf, downloadProfileDocx, downloadProfileOdt } from '$lib/services/export';
+	import { downloadTextFile, exportFilename } from '$lib/services/export/download';
 	import { PDF_DISCLAIMER } from '$lib/services/export/build-synthesis';
 	import type { ImportErrorCode } from '$lib/services/storage/import';
 	import { parseImportedProfileText } from '$lib/services/storage/import';
@@ -20,6 +21,7 @@
 	import { bilingualLabel, bilingualUi, confirmDynamicMessage, dynamicMessage, type UiKey } from '$lib/i18n';
 	import { PROFILE_VERSION } from '$lib/types/profile';
 	import { initProfileStorage } from '$lib/services/storage/local';
+	import { createDefaultProfile } from '$lib/services/storage/default-profile';
 	import {
 		fetchModuleStorageStats,
 		getStorageBackend,
@@ -140,6 +142,43 @@
 	function exportDocx() {
 		downloadProfileDocx(get(profileStore));
 		setStatus('dyn.settings.exportDocx');
+	}
+
+	function downloadExampleProfileJson() {
+		const now = new Date().toISOString();
+		const example = createDefaultProfile();
+		example.meta.updatedAt = now;
+		example.settings.ui.firstLaunchIntroDismissed = true;
+		example.settings.ui.theme = 'cream';
+		example.settings.ui.buttonSize = 'large';
+		example.settings.reading.font = 'atkinson-hyperlegible';
+		example.settings.reading.fontSize = 20;
+		example.settings.reading.lineHeight = 1.7;
+		example.activatedTools = ['read_adapted', 'listen_text', 'write_easier', 'organize_work'];
+		example.functionalProfiles.reading = [
+			{
+				id: 'lecture_longue_fatigante',
+				source: 'onboarding',
+				confirmedAt: now,
+				confidence: 'declared'
+			}
+		];
+		example.functionalProfiles.writing = [
+			{
+				id: 'difficulte_orthographique',
+				source: 'onboarding',
+				confirmedAt: now,
+				confidence: 'declared'
+			}
+		];
+		example.onboarding.path = 'known';
+		example.onboarding.completedSteps = ['known_tools', 'comfort'];
+
+		downloadTextFile(
+			JSON.stringify(example, null, 2),
+			exportFilename('exemple-profil-a-completer', 'json')
+		);
+		setStatus('dyn.settings.exportJson');
 	}
 
 	onMount(async () => {
@@ -273,6 +312,9 @@
 		<p class="settings-hint">
 			<BiText fr="Remplace le profil actuel après confirmation." key="panel.export.importHint" />
 		</p>
+		<button type="button" class="btn btn-secondary" onclick={downloadExampleProfileJson}>
+			Télécharger un exemple JSON à compléter
+		</button>
 	</div>
 </section>
 

@@ -51,6 +51,11 @@ const LOCAL_SPELLING_RULES: {
 		pattern: /\b[Ss]il vous plait\b/g,
 		message: 'Accent recommandé dans cette formule.',
 		suggestion: "s'il vous plaît"
+	},
+	{
+		pattern: /\b[Aa]\s+bientot\b/g,
+		message: 'Accent recommandé dans cette formule.',
+		suggestion: 'à bientôt'
 	}
 ];
 
@@ -73,6 +78,11 @@ const LOCAL_GRAMMAR_RULES: {
 		pattern: /\b[Ii]l\s+faut\s+que\s+je\s+vais\b/g,
 		message: 'Après « il faut que », on attend souvent le subjonctif.',
 		suggestion: "il faut que j'aille"
+	},
+	{
+		pattern: /\b[Jj]\s+ai\b/g,
+		message: "L'apostrophe est attendue dans « j'ai ».",
+		suggestion: "j'ai"
 	}
 ];
 
@@ -101,6 +111,36 @@ function findLocalSpellingIssues(text: string) {
 	const issues: SpellingIssue[] = localIssuesFromRules(text, LOCAL_SPELLING_RULES, 'spelling');
 	const trimmedEnd = text.trimEnd();
 	const firstLetter = text.match(/[A-Za-zÀ-ÖØ-öø-ÿ]/);
+
+	for (const match of text.matchAll(/\s+([,.;:!?])/g)) {
+		issues.push({
+			kind: 'punctuation',
+			message: 'Espace inutile avant ce signe de ponctuation.',
+			offset: match.index ?? 0,
+			length: match[0].length,
+			suggestion: match[1]
+		});
+	}
+
+	for (const match of text.matchAll(/([,.;:!?])(?=\S)/g)) {
+		issues.push({
+			kind: 'punctuation',
+			message: 'Une espace après la ponctuation peut améliorer la lisibilité.',
+			offset: (match.index ?? 0) + match[0].length,
+			length: 0,
+			suggestion: ' '
+		});
+	}
+
+	for (const match of text.matchAll(/ {2,}/g)) {
+		issues.push({
+			kind: 'punctuation',
+			message: 'Plusieurs espaces se suivent.',
+			offset: match.index ?? 0,
+			length: match[0].length,
+			suggestion: ' '
+		});
+	}
 
 	if (firstLetter && firstLetter[0] === firstLetter[0].toLowerCase()) {
 		issues.unshift({

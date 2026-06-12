@@ -39,6 +39,47 @@ function detectSourceKind(file: File): OcrSourceKind | null {
 	return null;
 }
 
+async function prepareBrowserImageForOcr(file: File): Promise<File | Blob> {
+	if (!browser || !file.type.startsWith('image/')) return file;
+
+	try {
+		const bitmap = await createImageBitmap(file);
+		const targetWidth = Math.min(Math.max(bitmap.width * 2, 1400), 2600);
+		const scale = Math.max(1, targetWidth / bitmap.width);
+		const width = Math.round(bitmap.width * scale);
+		const height = Math.round(bitmap.height * scale);
+		const canvas = document.createElement('canvas');
+		canvas.width = width;
+		canvas.height = height;
+		const context = canvas.getContext('2d', { willReadFrequently: true });
+		if (!context) return file;
+
+		context.fillStyle = '#ffffff';
+		context.fillRect(0, 0, width, height);
+		context.imageSmoothingEnabled = true;
+		context.imageSmoothingQuality = 'high';
+		context.drawImage(bitmap, 0, 0, width, height);
+		bitmap.close();
+
+		const image = context.getImageData(0, 0, width, height);
+		const data = image.data;
+		for (let index = 0; index < data.length; index += 4) {
+			const gray = data[index] * 0.299 + data[index + 1] * 0.587 + data[index + 2] * 0.114;
+			const contrasted = Math.max(0, Math.min(255, (gray - 128) * 1.2 + 128));
+			data[index] = contrasted;
+			data[index + 1] = contrasted;
+			data[index + 2] = contrasted;
+			data[index + 3] = 255;
+		}
+		context.putImageData(image, 0, 0);
+
+		const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+		return blob ?? file;
+	} catch {
+		return file;
+	}
+}
+
 class StubOcrService implements OcrService {
 	isAvailable() {
 		return false;
@@ -97,9 +138,14 @@ class WebOcrService implements OcrService {
 
 		let worker: Awaited<ReturnType<(typeof import('tesseract.js'))['createWorker']>> | null = null;
 		try {
-			const { createWorker } = await import('tesseract.js');
+			const { createWorker, PSM } = await import('tesseract.js');
 			worker = await createWorker(options.lang ?? 'fra');
-			const result = await worker.recognize(file);
+			await worker.setParameters({
+				preserve_interword_spaces: '1',
+				tessedit_pageseg_mode: PSM.SINGLE_BLOCK
+			});
+			const preparedFile = await prepareBrowserImageForOcr(file);
+			const result = await worker.recognize(preparedFile);
 			const text = result.data.text.trim();
 
 			if (!text) {

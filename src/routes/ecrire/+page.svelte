@@ -6,11 +6,15 @@
 	import WritingEditor from '$lib/components/writing/WritingEditor.svelte';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
-	import { settings } from '$lib/stores/profile';
+	import { profileStore, settings } from '$lib/stores/profile';
 
 
 
 	let text = $state('');
+
+	function exitDistractionMode() {
+		profileStore.updateSettings({ writing: { distractionFree: false } });
+	}
 
 </script>
 
@@ -40,6 +44,9 @@
 		<div class="distraction-banner card">
 
 			<p><strong>Mode sans distraction.</strong> Seul l'éditeur est affiché.</p>
+			<button type="button" class="btn btn-secondary" onclick={exitDistractionMode}>
+				Quitter le mode sans distraction
+			</button>
 
 		</div>
 
@@ -126,7 +133,16 @@
 	.distraction-banner {
 
 		grid-column: 1 / -1;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-md);
+		flex-wrap: wrap;
 
+	}
+
+	.distraction-banner p {
+		margin: 0;
 	}
 
 </style>

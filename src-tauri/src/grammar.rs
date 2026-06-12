@@ -1,6 +1,6 @@
 use std::fs;
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -82,6 +82,10 @@ fn grammalecte_commands() -> Vec<GrammalecteCommand> {
                     prefix_args: vec![trimmed.to_string()],
                 });
                 commands.push(GrammalecteCommand {
+                    program: "py".to_string(),
+                    prefix_args: vec!["-3".to_string(), trimmed.to_string()],
+                });
+                commands.push(GrammalecteCommand {
                     program: "python3".to_string(),
                     prefix_args: vec![trimmed.to_string()],
                 });
@@ -94,7 +98,73 @@ fn grammalecte_commands() -> Vec<GrammalecteCommand> {
         }
     }
 
+    for path in grammalecte_cli_candidates() {
+        let value = path.to_string_lossy().to_string();
+        commands.push(GrammalecteCommand {
+            program: "python".to_string(),
+            prefix_args: vec![value.clone()],
+        });
+        commands.push(GrammalecteCommand {
+            program: "py".to_string(),
+            prefix_args: vec!["-3".to_string(), value.clone()],
+        });
+        commands.push(GrammalecteCommand {
+            program: "python3".to_string(),
+            prefix_args: vec![value],
+        });
+    }
+
     commands
+}
+
+fn find_file_named(root: &Path, filename: &str, depth: usize) -> Option<PathBuf> {
+    if depth == 0 || !root.is_dir() {
+        return None;
+    }
+
+    let entries = fs::read_dir(root).ok()?;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_file()
+            && path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(|name| name.eq_ignore_ascii_case(filename))
+        {
+            return Some(path);
+        }
+        if path.is_dir() {
+            if let Some(found) = find_file_named(&path, filename, depth - 1) {
+                return Some(found);
+            }
+        }
+    }
+
+    None
+}
+
+fn grammalecte_cli_candidates() -> Vec<PathBuf> {
+    let mut candidates = Vec::new();
+
+    #[cfg(windows)]
+    {
+        if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
+            let root = PathBuf::from(local_app_data)
+                .join("Accessible")
+                .join("Grammalecte");
+            if let Some(path) = find_file_named(&root, "grammalecte-cli.py", 6) {
+                candidates.push(path);
+            }
+        }
+        if let Ok(app_data) = std::env::var("APPDATA") {
+            let root = PathBuf::from(app_data).join("Grammalecte");
+            if let Some(path) = find_file_named(&root, "grammalecte-cli.py", 6) {
+                candidates.push(path);
+            }
+        }
+    }
+
+    candidates
 }
 
 fn command_help_works(command: &GrammalecteCommand) -> bool {

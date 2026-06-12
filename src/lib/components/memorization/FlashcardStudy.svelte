@@ -127,18 +127,21 @@
 			<BiText fr="Carte" key="mod.memorize.study.cardProgress" inline /> {progress}
 		</p>
 
-		<div class="study-card">
-			<p class="study-label"><BiText fr="Question" key="mod.memorize.study.question" inline /></p>
-			<p class="study-front">{current.front}</p>
+		<div class="study-card-shell" role="group" aria-label="Carte de révision" aria-live="polite">
+			<div class="study-card-inner" class:study-card-inner--revealed={revealed}>
+				<section class="study-card-face study-card-front" aria-hidden={revealed}>
+					<p class="study-label"><BiText fr="Question" key="mod.memorize.study.question" inline /></p>
+					<p class="study-card-text">{current.front}</p>
+					<button type="button" class="btn btn-primary" tabindex={revealed ? -1 : 0} onclick={reveal}>
+						<BiText fr="Voir la réponse" key="mod.memorize.study.reveal" inline />
+					</button>
+				</section>
 
-			{#if revealed}
-				<p class="study-label"><BiText fr="Réponse" key="mod.memorize.study.answer" inline /></p>
-				<p class="study-back">{current.back}</p>
-			{:else}
-				<button type="button" class="btn btn-secondary" onclick={reveal}>
-					<BiText fr="Voir la réponse" key="mod.memorize.study.reveal" inline />
-				</button>
-			{/if}
+				<section class="study-card-face study-card-back" aria-hidden={!revealed}>
+					<p class="study-label"><BiText fr="Réponse" key="mod.memorize.study.answer" inline /></p>
+					<p class="study-card-text">{current.back}</p>
+				</section>
+			</div>
 		</div>
 
 		{#if revealed}
@@ -185,11 +188,70 @@
 		margin-bottom: var(--space-md);
 	}
 
-	.study-card {
-		padding: var(--space-lg);
+	.study-card-shell {
+		position: relative;
+		perspective: 60rem;
+		width: min(100%, 36rem);
+		margin: 0 auto var(--space-lg);
+	}
+
+	.study-card-shell::before,
+	.study-card-shell::after {
+		content: '';
+		position: absolute;
+		inset: var(--space-sm);
+		border: 1px solid var(--color-border);
+		border-radius: calc(var(--radius) * 1.4);
 		background: var(--color-bg-elevated);
-		border-radius: var(--radius);
-		margin-bottom: var(--space-md);
+		transform: rotate(-1.5deg) translateY(0.35rem);
+		opacity: 0.55;
+	}
+
+	.study-card-shell::after {
+		transform: rotate(1.5deg) translateY(0.7rem);
+		opacity: 0.35;
+	}
+
+	.study-card-inner {
+		position: relative;
+		z-index: 1;
+		min-height: clamp(18rem, 42vw, 24rem);
+		transform-style: preserve-3d;
+		transition: transform 320ms ease;
+	}
+
+	.study-card-inner--revealed {
+		transform: rotateY(180deg);
+	}
+
+	.study-card-face {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: var(--space-md);
+		padding: var(--space-xl);
+		background: var(--color-bg-elevated);
+		border: 2px solid var(--color-border);
+		border-radius: calc(var(--radius) * 1.4);
+		box-shadow: 0 0.45rem 1.4rem color-mix(in srgb, var(--color-text) 12%, transparent);
+		backface-visibility: hidden;
+		text-align: center;
+	}
+
+	.study-card-front {
+		border-color: var(--color-accent);
+	}
+
+	.study-card-back {
+		transform: rotateY(180deg);
+		border-color: var(--color-accent);
+	}
+
+	.study-card-inner--revealed .study-card-front,
+	.study-card-inner:not(.study-card-inner--revealed) .study-card-back {
+		pointer-events: none;
 	}
 
 	.study-label {
@@ -199,11 +261,20 @@
 		color: var(--color-text-muted);
 	}
 
-	.study-front,
-	.study-back {
-		margin: 0 0 var(--space-lg);
-		font-size: var(--font-size-lg);
+	.study-card-text {
+		margin: 0;
+		font-size: var(--font-size-xl);
 		line-height: 1.6;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.study-card-inner {
+			transition: none;
+		}
+	}
+
+	:global(.app-shell.reduce-motion) .study-card-inner {
+		transition: none;
 	}
 
 	.study-ratings {

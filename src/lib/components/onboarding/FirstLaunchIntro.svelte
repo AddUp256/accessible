@@ -11,7 +11,6 @@
 
 	const visible = $derived(!$settings.ui.firstLaunchIntroDismissed && !hiddenForSession);
 	const continueLabel = $derived(bilingualUi('Commencer le parcours', 'profile.path.start', $settings.ui));
-	const dismissLabel = $derived(bilingualUi('Ne plus afficher', 'intro.dismiss', $settings.ui));
 
 	const features: { fr: string; key: UiKey }[] = [
 		{
@@ -37,13 +36,9 @@
 	}
 
 	async function startPersonalization() {
-		hiddenForSession = true;
-		await goto('/onboarding');
-	}
-
-	function dismissPermanently() {
 		profileStore.updateSettings({ ui: { firstLaunchIntroDismissed: true } });
 		hiddenForSession = true;
+		await goto('/onboarding');
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -124,9 +119,6 @@
 						secondary={continueLabel.secondary}
 						inline
 					/>
-				</button>
-				<button type="button" class="btn btn-secondary" onclick={dismissPermanently}>
-					<BilingualText primary={dismissLabel.primary} secondary={dismissLabel.secondary} inline />
 				</button>
 			</div>
 		</dialog>

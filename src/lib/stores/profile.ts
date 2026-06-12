@@ -120,6 +120,15 @@ function createProfileStore() {
 			activeProfileId.set(profileId);
 			await refreshProfileSummaries();
 		},
+		flushPendingSaves: async () => {
+			const current = get({ subscribe });
+			if (current.privacy.guestMode) {
+				await saveQueue.catch(() => undefined);
+				return;
+			}
+			enqueueProfileSave(current);
+			await saveQueue;
+		},
 		exportJson: (): string => JSON.stringify(get({ subscribe }), null, 2)
 	};
 }

@@ -52,12 +52,170 @@ fn hidden_command(program: &str) -> Command {
     }
 }
 
+fn hidden_path_command(program: &Path) -> Command {
+    #[cfg(windows)]
+    {
+        let mut command = Command::new(program);
+        command.creation_flags(0x08000000);
+        command
+    }
+    #[cfg(not(windows))]
+    {
+        Command::new(program)
+    }
+}
+
+#[cfg(windows)]
+fn executable_name(name: &str) -> String {
+    format!("{name}.exe")
+}
+
+#[cfg(not(windows))]
+fn executable_name(name: &str) -> String {
+    name.to_string()
+}
+
+fn path_env_candidates(binary: &str) -> Vec<PathBuf> {
+    let executable = executable_name(binary);
+    std::env::var_os("PATH")
+        .map(|paths| {
+            std::env::split_paths(&paths)
+                .map(|path| path.join(&executable))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+fn find_file_named(root: &Path, filename: &str, depth: usize) -> Option<PathBuf> {
+    if depth == 0 || !root.is_dir() {
+        return None;
+    }
+
+    let entries = fs::read_dir(root).ok()?;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_file()
+            && path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(|name| name.eq_ignore_ascii_case(filename))
+        {
+            return Some(path);
+        }
+        if path.is_dir() {
+            if let Some(found) = find_file_named(&path, filename, depth - 1) {
+                return Some(found);
+            }
+        }
+    }
+
+    None
+}
+
+fn resolve_existing_binary(candidates: Vec<PathBuf>) -> Option<PathBuf> {
+    candidates.into_iter().find(|path| path.is_file())
+}
+
+fn command_from_candidates(binary: &str, candidates: Vec<PathBuf>) -> Command {
+    if let Some(path) = resolve_existing_binary(candidates) {
+        return hidden_path_command(&path);
+    }
+    hidden_command(binary)
+}
+
+fn ffmpeg_candidates() -> Vec<PathBuf> {
+    let mut candidates = Vec::new();
+
+    if let Ok(path) = std::env::var("FFMPEG_CMD") {
+        if !path.trim().is_empty() {
+            candidates.push(PathBuf::from(path.trim()));
+        }
+    }
+
+    #[cfg(windows)]
+    {
+        if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
+            candidates.push(
+                PathBuf::from(&local_app_data)
+                    .join("Microsoft")
+                    .join("WindowsApps")
+                    .join("ffmpeg.exe"),
+            );
+            let winget = PathBuf::from(&local_app_data)
+                .join("Microsoft")
+                .join("WinGet")
+                .join("Packages");
+            if let Some(path) = find_file_named(&winget, "ffmpeg.exe", 6) {
+                candidates.push(path);
+            }
+        }
+
+        for env_key in ["ProgramFiles", "ProgramFiles(x86)"] {
+            if let Ok(root) = std::env::var(env_key) {
+                candidates.push(
+                    PathBuf::from(&root)
+                        .join("ffmpeg")
+                        .join("bin")
+                        .join("ffmpeg.exe"),
+                );
+                candidates.push(
+                    PathBuf::from(&root)
+                        .join("Gyan")
+                        .join("ffmpeg")
+                        .join("bin")
+                        .join("ffmpeg.exe"),
+                );
+            }
+        }
+    }
+
+    candidates.extend(path_env_candidates("ffmpeg"));
+    candidates
+}
+
 fn ffmpeg_command() -> Command {
-    hidden_command("ffmpeg")
+    command_from_candidates("ffmpeg", ffmpeg_candidates())
+}
+
+fn whisper_binary_candidates() -> Vec<PathBuf> {
+    let mut candidates = Vec::new();
+
+    if let Ok(path) = std::env::var("WHISPER_CLI") {
+        if !path.trim().is_empty() {
+            candidates.push(PathBuf::from(path.trim()));
+        }
+    }
+
+    #[cfg(windows)]
+    {
+        if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
+            let root = PathBuf::from(&local_app_data)
+                .join("Accessible")
+                .join("whisper.cpp");
+            for name in ["whisper-cli.exe", "whisper.exe", "main.exe"] {
+                if let Some(path) = find_file_named(&root, name, 6) {
+                    candidates.push(path);
+                }
+            }
+        }
+    }
+
+    for binary in ["whisper-cli", "whisper", "main"] {
+        candidates.extend(path_env_candidates(binary));
+    }
+
+    candidates
 }
 
 fn whisper_commands() -> Vec<WhisperCommand> {
-    vec![
+    let mut commands: Vec<WhisperCommand> = whisper_binary_candidates()
+        .into_iter()
+        .map(|path| WhisperCommand {
+            program: path.to_string_lossy().to_string(),
+        })
+        .collect();
+
+    commands.extend([
         WhisperCommand {
             program: "whisper-cli".to_string(),
         },
@@ -67,7 +225,9 @@ fn whisper_commands() -> Vec<WhisperCommand> {
         WhisperCommand {
             program: "main".to_string(),
         },
-    ]
+    ]);
+
+    commands
 }
 
 fn whisper_help_works(command: &WhisperCommand) -> bool {
@@ -91,20 +251,59 @@ pub fn is_ffmpeg_installed() -> bool {
 }
 
 fn resolve_whisper_model() -> Result<PathBuf, String> {
-    let path = std::env::var("WHISPER_MODEL").map_err(|_| {
-        "Variable WHISPER_MODEL non définie. Indiquez le chemin vers un modèle Whisper (.bin ou .gguf)."
-            .to_string()
-    })?;
+    if let Ok(path) = std::env::var("WHISPER_MODEL") {
+        let model_path = PathBuf::from(path.trim());
+        if model_path.is_file() {
+            return Ok(model_path);
+        }
 
-    let model_path = PathBuf::from(path.trim());
-    if !model_path.is_file() {
         return Err(format!(
             "Modèle Whisper introuvable : {}",
             model_path.to_string_lossy()
         ));
     }
 
-    Ok(model_path)
+    if let Some(model_path) = default_whisper_model() {
+        return Ok(model_path);
+    }
+
+    Err(
+        "Variable WHISPER_MODEL non définie. Indiquez le chemin vers un modèle Whisper (.bin ou .gguf)."
+            .to_string(),
+    )
+}
+
+fn default_whisper_model() -> Option<PathBuf> {
+    let mut model_dirs = Vec::new();
+
+    #[cfg(windows)]
+    {
+        if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
+            model_dirs.push(
+                PathBuf::from(local_app_data)
+                    .join("Accessible")
+                    .join("whisper.cpp")
+                    .join("models"),
+            );
+        }
+    }
+
+    for dir in model_dirs {
+        for name in [
+            "ggml-base.bin",
+            "ggml-small.bin",
+            "ggml-tiny.bin",
+            "ggml-base-q8_0.bin",
+            "ggml-small-q8_0.bin",
+        ] {
+            let path = dir.join(name);
+            if path.is_file() {
+                return Some(path);
+            }
+        }
+    }
+
+    None
 }
 
 pub fn whisper_status() -> WhisperStatusDto {

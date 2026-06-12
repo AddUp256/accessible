@@ -301,6 +301,7 @@ pub fn run() {
             espeak::get_espeak_status,
             espeak::espeak_synthesize,
             ocr::is_tesseract_available,
+            ocr::is_tesseract_language_available,
             ocr::ocr_extract_text,
             spellcheck::is_hunspell_available,
             spellcheck::spellcheck_text,

@@ -36,8 +36,8 @@ const PIPER_STUB_REASON = DYNAMIC_FR['dyn.service.ttsPiperStub'];
 
 const ESPEAK_STUB_REASON = DYNAMIC_FR['dyn.service.ttsEspeakStub'];
 
-const LOCAL_AUDIO_PRIME_MS = 160;
-const WEB_SPEECH_START_DELAY_MS = 180;
+const LOCAL_AUDIO_PRIME_MS = 240;
+const WEB_SPEECH_START_DELAY_MS = 240;
 
 const AUDIO_DISABLED_REASON = 'Audio désactivé dans Accessible.';
 

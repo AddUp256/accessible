@@ -1,4 +1,5 @@
 use std::io::Write;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 use serde::Serialize;
@@ -17,15 +18,140 @@ pub struct SpellingIssueDto {
 }
 
 fn hunspell_command() -> Command {
+    if let Some(binary) = resolve_existing_binary(hunspell_candidates()) {
+        let mut command = hidden_path_command(&binary);
+        apply_dictionary_env(&mut command);
+        return command;
+    }
+
     #[cfg(windows)]
     {
         let mut command = Command::new("hunspell");
+        command.creation_flags(0x08000000);
+        apply_dictionary_env(&mut command);
+        command
+    }
+    #[cfg(not(windows))]
+    {
+        let mut command = Command::new("hunspell");
+        apply_dictionary_env(&mut command);
+        command
+    }
+}
+
+fn hidden_path_command(program: &Path) -> Command {
+    #[cfg(windows)]
+    {
+        let mut command = Command::new(program);
         command.creation_flags(0x08000000);
         command
     }
     #[cfg(not(windows))]
     {
-        Command::new("hunspell")
+        Command::new(program)
+    }
+}
+
+#[cfg(windows)]
+fn executable_name(name: &str) -> String {
+    format!("{name}.exe")
+}
+
+#[cfg(not(windows))]
+fn executable_name(name: &str) -> String {
+    name.to_string()
+}
+
+fn path_env_candidates(binary: &str) -> Vec<PathBuf> {
+    let executable = executable_name(binary);
+    std::env::var_os("PATH")
+        .map(|paths| {
+            std::env::split_paths(&paths)
+                .map(|path| path.join(&executable))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+fn hunspell_candidates() -> Vec<PathBuf> {
+    let mut candidates = Vec::new();
+
+    if let Ok(path) = std::env::var("HUNSPELL_CMD") {
+        if !path.trim().is_empty() {
+            candidates.push(PathBuf::from(path.trim()));
+        }
+    }
+
+    #[cfg(windows)]
+    {
+        if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
+            candidates.push(
+                PathBuf::from(&local_app_data)
+                    .join("Microsoft")
+                    .join("WindowsApps")
+                    .join("hunspell.exe"),
+            );
+            candidates.push(
+                PathBuf::from(&local_app_data)
+                    .join("Programs")
+                    .join("Hunspell")
+                    .join("hunspell.exe"),
+            );
+        }
+
+        for env_key in ["ProgramFiles", "ProgramFiles(x86)"] {
+            if let Ok(root) = std::env::var(env_key) {
+                candidates.push(PathBuf::from(&root).join("Hunspell").join("hunspell.exe"));
+                candidates.push(
+                    PathBuf::from(&root)
+                        .join("Hunspell")
+                        .join("bin")
+                        .join("hunspell.exe"),
+                );
+                candidates.push(
+                    PathBuf::from(&root)
+                        .join("FSFhu")
+                        .join("Hunspell")
+                        .join("hunspell.exe"),
+                );
+            }
+        }
+    }
+
+    candidates.extend(path_env_candidates("hunspell"));
+    candidates
+}
+
+fn resolve_existing_binary(candidates: Vec<PathBuf>) -> Option<PathBuf> {
+    candidates.into_iter().find(|path| path.is_file())
+}
+
+fn dictionary_dir_candidates() -> Vec<PathBuf> {
+    let mut dirs = Vec::new();
+
+    if let Ok(dicpath) = std::env::var("DICPATH") {
+        dirs.extend(std::env::split_paths(&dicpath).filter(|path| path.is_dir()));
+    }
+
+    if let Ok(app_data) = std::env::var("APPDATA") {
+        dirs.push(PathBuf::from(&app_data).join("hunspell").join("dicts"));
+    }
+
+    if let Ok(user_profile) = std::env::var("USERPROFILE") {
+        dirs.push(PathBuf::from(&user_profile).join("hunspell-dicts"));
+    }
+
+    dirs.into_iter().filter(|path| path.is_dir()).collect()
+}
+
+fn apply_dictionary_env(command: &mut Command) {
+    let dirs = dictionary_dir_candidates();
+    if dirs.is_empty() {
+        return;
+    }
+
+    if let Ok(joined) = std::env::join_paths(dirs) {
+        command.env("DICPATH", joined);
     }
 }
 

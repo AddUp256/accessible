@@ -2,6 +2,7 @@
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import { bilingualLabel, type UiKey } from '$lib/i18n';
+	import { readingSettingsToStyle } from '$lib/modules/reading/font-stacks';
 	import { profileStore, settings } from '$lib/stores/profile';
 	import { isExpertDetail } from '$lib/utils/detail-level';
 	import type {
@@ -14,6 +15,7 @@
 	} from '$lib/types/profile';
 
 	const expert = $derived(isExpertDetail($profileStore));
+	const readingPreviewStyle = $derived(readingSettingsToStyle($settings.reading));
 
 	const buttonSizes: { value: UISettings['buttonSize']; fr: string; key: UiKey }[] = [
 		{ value: 'normal', fr: 'Normal', key: 'size.normal' },
@@ -194,6 +196,14 @@
 				oninput={(e) => patchReading({ maxColumnWidth: Number(e.currentTarget.value) })}
 			/>
 		</label>
+
+		<div class="expert-reading-preview" style={readingPreviewStyle} aria-live="polite">
+			<strong>Aperçu lecture</strong>
+			<p>
+				Ce texte applique la police, la taille, l’interligne, les espacements et la largeur maximale
+				choisis dans les réglages avancés.
+			</p>
+		</div>
 
 		<label class="expert-check">
 			<input
@@ -394,6 +404,17 @@
 	.expert-field input[type='range'] {
 		min-height: var(--btn-min-height);
 		font-size: var(--font-size-base);
+	}
+
+	.expert-reading-preview {
+		margin: var(--space-sm) 0 var(--space-md);
+		padding: var(--space-md);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+	}
+
+	.expert-reading-preview p {
+		margin-bottom: 0;
 	}
 
 	.expert-check {

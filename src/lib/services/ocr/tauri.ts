@@ -4,6 +4,10 @@ export async function tauriIsTesseractAvailable(): Promise<boolean> {
 	return invoke<boolean>('is_tesseract_available');
 }
 
+export async function tauriIsTesseractLanguageAvailable(lang = 'fra'): Promise<boolean> {
+	return invoke<boolean>('is_tesseract_language_available', { lang });
+}
+
 export async function tauriOcrExtractText(
 	imageBytes: number[],
 	filename: string,

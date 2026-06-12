@@ -1,9 +1,14 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { profileStore } from '$lib/stores/profile';
 	import { MEDICAL_PROFILES_BY_ID } from '$lib/config/medical-profiles';
 	import { TOOLS_BY_ID } from '$lib/config/tools-catalog';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
+
+	onMount(() => {
+		profileStore.updateSettings({ ui: { firstLaunchIntroDismissed: true } });
+	});
 </script>
 
 <svelte:head>

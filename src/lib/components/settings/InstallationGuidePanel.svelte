@@ -1,15 +1,122 @@
 <script lang="ts">
 	const releaseUrl = 'https://github.com/AddUp256/accessible/releases';
 	const browserUrl = 'https://addup256.github.io/accessible/';
-	const windowsCommands = [
+	type WindowsCommand = {
+		label: string;
+		summary: string;
+		command: string;
+	};
+	const windowsCommands: WindowsCommand[] = [
 		{
-			label: 'Tesseract OCR',
-			command: 'winget install --id UB-Mannheim.TesseractOCR --exact --source winget'
+			label: 'OCR : Tesseract + pack français fra',
+			summary:
+				'Installe Tesseract, ajoute le pack français depuis tessdata, déclare TESSDATA_PREFIX et ajoute Tesseract au PATH utilisateur.',
+			command: [
+				'$ErrorActionPreference = "Stop"',
+				'winget install --id UB-Mannheim.TesseractOCR --exact --source winget --accept-package-agreements --accept-source-agreements',
+				'$roots = @($env:ProgramFiles + "\\Tesseract-OCR", ${env:ProgramFiles(x86)} + "\\Tesseract-OCR")',
+				'$root = $roots | Where-Object { Test-Path (Join-Path $_ "tesseract.exe") } | Select-Object -First 1',
+				'if (-not $root) { throw "Tesseract est installé mais tesseract.exe est introuvable. Relancez PowerShell puis réessayez." }',
+				'$tessdata = Join-Path $root "tessdata"',
+				'New-Item -ItemType Directory -Force $tessdata | Out-Null',
+				'Invoke-WebRequest "https://raw.githubusercontent.com/tesseract-ocr/tessdata/main/fra.traineddata" -OutFile (Join-Path $tessdata "fra.traineddata")',
+				'setx TESSDATA_PREFIX $tessdata',
+				'$userPath = [Environment]::GetEnvironmentVariable("Path", "User")',
+				'if (-not $userPath) { $userPath = "" }',
+				'if ($userPath -notlike ("*" + $root + "*")) { setx Path (($userPath.TrimEnd(";")) + ";" + $root) }',
+				'& (Join-Path $root "tesseract.exe") --list-langs'
+			].join('\n')
 		},
-		{ label: 'FFmpeg', command: 'winget install --id Gyan.FFmpeg --exact --source winget' },
 		{
-			label: 'eSpeak NG',
-			command: 'winget install --id eSpeak-NG.eSpeak-NG --exact --source winget'
+			label: 'Orthographe : Hunspell + dictionnaire français',
+			summary:
+				'Installe Hunspell, télécharge fr.aff/fr.dic depuis LibreOffice, les expose sous fr_FR et déclare DICPATH.',
+			command: [
+				'$ErrorActionPreference = "Stop"',
+				'winget install --id FSFhu.Hunspell --exact --source winget --accept-package-agreements --accept-source-agreements',
+				'$dictDir = Join-Path $env:APPDATA "hunspell\\dicts"',
+				'New-Item -ItemType Directory -Force $dictDir | Out-Null',
+				'Invoke-WebRequest "https://raw.githubusercontent.com/LibreOffice/dictionaries/master/fr_FR/fr.aff" -OutFile (Join-Path $dictDir "fr_FR.aff")',
+				'Invoke-WebRequest "https://raw.githubusercontent.com/LibreOffice/dictionaries/master/fr_FR/fr.dic" -OutFile (Join-Path $dictDir "fr_FR.dic")',
+				'Copy-Item (Join-Path $dictDir "fr_FR.aff") (Join-Path $dictDir "fr.aff") -Force',
+				'Copy-Item (Join-Path $dictDir "fr_FR.dic") (Join-Path $dictDir "fr.dic") -Force',
+				'setx DICPATH $dictDir',
+				'Write-Host "Dictionnaires Hunspell installés dans $dictDir. Relancez Accessible."'
+			].join('\n')
+		},
+		{
+			label: 'Grammaire : Grammalecte CLI',
+			summary:
+				'Télécharge la dernière archive CLI/serveur officielle, trouve grammalecte-cli.py et définit GRAMMALECTE_CLI.',
+			command: [
+				'$ErrorActionPreference = "Stop"',
+				'winget install --id Python.Python.3.12 --exact --source winget --accept-package-agreements --accept-source-agreements',
+				'$target = Join-Path $env:LOCALAPPDATA "Accessible\\Grammalecte"',
+				'New-Item -ItemType Directory -Force $target | Out-Null',
+				'$page = (Invoke-WebRequest "https://www.grammalecte.net/" -UseBasicParsing).Content',
+				'$match = [regex]::Match($page, "/zip/Grammalecte-fr-v[0-9.]+\\.zip")',
+				'if (-not $match.Success) { throw "Lien Grammalecte CLI introuvable sur grammalecte.net." }',
+				'$zipUrl = "https://www.grammalecte.net" + $match.Value',
+				'$zip = Join-Path $target "grammalecte.zip"',
+				'Invoke-WebRequest $zipUrl -OutFile $zip',
+				'Expand-Archive $zip -DestinationPath $target -Force',
+				'$cli = Get-ChildItem $target -Recurse -Filter "grammalecte-cli.py" | Select-Object -First 1',
+				'if (-not $cli) { throw "grammalecte-cli.py est introuvable dans l archive téléchargée." }',
+				'setx GRAMMALECTE_CLI $cli.FullName',
+				'$py = Get-Command py -ErrorAction SilentlyContinue',
+				'if ($py) { & py -3 $cli.FullName -h } else { Write-Host "Python est installé. Relancez PowerShell si py n est pas encore disponible." }',
+				'Write-Host "Grammalecte CLI déclaré. Relancez Accessible."'
+			].join('\n')
+		},
+		{
+			label: 'Transcription : FFmpeg + whisper.cpp + modèle rapide',
+			summary:
+				'Installe FFmpeg, télécharge le dernier whisper.cpp x64, ajoute whisper-cli au PATH et configure un modèle de transcription local.',
+			command: [
+				'$ErrorActionPreference = "Stop"',
+				'winget install --id Gyan.FFmpeg --exact --source winget --accept-package-agreements --accept-source-agreements',
+				'$root = Join-Path $env:LOCALAPPDATA "Accessible\\whisper.cpp"',
+				'New-Item -ItemType Directory -Force $root | Out-Null',
+				'$release = Invoke-RestMethod "https://api.github.com/repos/ggml-org/whisper.cpp/releases/latest"',
+				'$asset = $release.assets | Where-Object { $_.name -eq "whisper-bin-x64.zip" } | Select-Object -First 1',
+				'if (-not $asset) { throw "Archive whisper-bin-x64.zip introuvable dans la dernière release." }',
+				'$zip = Join-Path $root $asset.name',
+				'Invoke-WebRequest $asset.browser_download_url -OutFile $zip',
+				'Expand-Archive $zip -DestinationPath $root -Force',
+				'$cli = Get-ChildItem $root -Recurse -Filter "whisper-cli.exe" | Select-Object -First 1',
+				'if (-not $cli) { throw "whisper-cli.exe est introuvable dans l archive téléchargée." }',
+				'$bin = $cli.Directory.FullName',
+				'$userPath = [Environment]::GetEnvironmentVariable("Path", "User")',
+				'if (-not $userPath) { $userPath = "" }',
+				'if ($userPath -notlike ("*" + $bin + "*")) { setx Path (($userPath.TrimEnd(";")) + ";" + $bin) }',
+				'$modelDir = Join-Path $root "models"',
+				'New-Item -ItemType Directory -Force $modelDir | Out-Null',
+				'$model = Join-Path $modelDir "ggml-base.bin"',
+				'Invoke-WebRequest "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin?download=true" -OutFile $model',
+				'setx WHISPER_MODEL $model',
+				'& $cli.FullName --help',
+				'Write-Host "Transcription prête. Relancez Accessible."'
+			].join('\n')
+		},
+		{
+			label: 'Lecture vocale locale : eSpeak NG',
+			summary: 'Installe un moteur vocal local léger, utilisé si les voix système ou Piper ne suffisent pas.',
+			command:
+				'winget install --id eSpeak-NG.eSpeak-NG --exact --source winget --accept-package-agreements --accept-source-agreements'
+		},
+		{
+			label: 'Vérifier les modules',
+			summary:
+				'Affiche les versions et les variables attendues. Fermez puis relancez Accessible après une installation.',
+			command: [
+				'$ErrorActionPreference = "Continue"',
+				'Get-Command tesseract,hunspell,ffmpeg,whisper-cli,espeak-ng -ErrorAction SilentlyContinue | Select-Object Name,Source',
+				'Write-Host "TESSDATA_PREFIX=$env:TESSDATA_PREFIX"',
+				'Write-Host "DICPATH=$env:DICPATH"',
+				'Write-Host "GRAMMALECTE_CLI=$env:GRAMMALECTE_CLI"',
+				'Write-Host "WHISPER_MODEL=$env:WHISPER_MODEL"',
+				'tesseract --list-langs'
+			].join('\n')
 		}
 	];
 
@@ -69,14 +176,28 @@
 		<h4 id="optional-tools-heading">Modules optionnels sous Windows</h4>
 		<p class="installation-hint">
 			Ouvrir PowerShell, copier chaque commande, accepter les confirmations Windows, puis redémarrer
-			Accessible.
+			Accessible. Les commandes ci-dessous installent ou configurent les modules les plus utiles :
+			OCR français, correction orthographique, correction grammaticale, transcription locale et voix
+			locale. Elles utilisent les sources officielles quand le module dépend d’un fichier externe.
 		</p>
+		<ul class="source-links" aria-label="Sources des modules optionnels">
+			<li><a href="https://github.com/tesseract-ocr/tessdata" target="_blank" rel="noreferrer">Tesseract tessdata</a></li>
+			<li><a href="https://github.com/LibreOffice/dictionaries/tree/master/fr_FR" target="_blank" rel="noreferrer">LibreOffice dictionaries fr_FR</a></li>
+			<li><a href="https://www.grammalecte.net/" target="_blank" rel="noreferrer">Grammalecte CLI</a></li>
+			<li><a href="https://github.com/ggml-org/whisper.cpp/releases/latest" target="_blank" rel="noreferrer">whisper.cpp</a></li>
+		</ul>
 		<div class="command-list">
 			{#each windowsCommands as item}
 				<div class="command-row">
 					<strong>{item.label}</strong>
+					<p>{item.summary}</p>
 					<code>{item.command}</code>
-					<button type="button" class="btn btn-secondary" onclick={() => copyCommand(item.command)}>
+					<button
+						type="button"
+						class="btn btn-secondary"
+						aria-label={`Copier la commande ${item.label}`}
+						onclick={() => copyCommand(item.command)}
+					>
 						Copier
 					</button>
 				</div>
@@ -168,9 +289,22 @@
 		gap: var(--space-xs);
 	}
 
+	.command-row p,
+	.source-links {
+		margin: 0;
+		color: var(--color-text-muted);
+		font-size: var(--font-size-sm);
+	}
+
+	.source-links {
+		padding-left: var(--space-lg);
+		line-height: 1.6;
+	}
+
 	.command-row code {
 		display: block;
 		overflow-wrap: anywhere;
+		white-space: pre-wrap;
 		padding: var(--space-sm);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius);

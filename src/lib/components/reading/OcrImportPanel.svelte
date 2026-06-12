@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import { dynamicMessage, translateServiceMessage } from '$lib/i18n';
@@ -7,7 +6,10 @@
 	import { ocr, OCR_ACCEPTED_EXTENSIONS } from '$lib/services/ocr';
 	import TesseractInstallGuide from '$lib/components/reading/TesseractInstallGuide.svelte';
 	import { isTauriRuntime } from '$lib/services/storage/tauri';
-	import { tauriIsTesseractAvailable } from '$lib/services/ocr/tauri';
+	import {
+		tauriIsTesseractAvailable,
+		tauriIsTesseractLanguageAvailable
+	} from '$lib/services/ocr/tauri';
 
 	let {
 		ontextimported
@@ -18,6 +20,7 @@
 	let status = $state('');
 	let busy = $state(false);
 	let previewUrl = $state<string | null>(null);
+	let tesseractInstalled = $state<boolean | null>(null);
 	let tesseractReady = $state<boolean | null>(null);
 	const browserOcrAvailable = $derived(!isTauriRuntime() && ocr.isAvailable());
 	const tesseractLangByUi: Record<string, string> = {
@@ -44,10 +47,21 @@
 			: null
 	);
 
-	onMount(async () => {
+	async function refreshTesseractStatus() {
 		if (!isTauriRuntime()) return;
-		tesseractReady = await tauriIsTesseractAvailable();
+		tesseractInstalled = await tauriIsTesseractAvailable();
+		if (!tesseractInstalled) {
+			tesseractReady = false;
+			return;
+		}
+		tesseractReady = await tauriIsTesseractLanguageAvailable(ocrLang);
+	}
+
+	$effect(() => {
+		ocrLang;
+		void refreshTesseractStatus();
 	});
+
 	function clearPreview() {
 		if (previewUrl) {
 			URL.revokeObjectURL(previewUrl);
@@ -100,11 +114,17 @@
 			<BiText fr="Tesseract est prêt sur cet appareil." key="mod.read.ocr.tesseractReady" inline />
 		{:else if isTauriRuntime() && tesseractReady === false}
 			{' '}
-			<BiText
-				fr="Installez Tesseract OCR et le pack français (fra) pour activer l'OCR."
-				key="mod.read.ocr.tesseractMissing"
-				inline
-			/>
+			{#if tesseractInstalled === true}
+				<span class="ocr-inline-note">
+					Tesseract est installé, mais le pack français (fra) manque pour lire le texte.
+				</span>
+			{:else}
+				<BiText
+					fr="Installez Tesseract OCR et le pack français (fra) pour activer l'OCR."
+					key="mod.read.ocr.tesseractMissing"
+					inline
+				/>
+			{/if}
 		{:else if browserOcrAvailable}
 			{' '}
 			<span class="ocr-inline-note">
@@ -133,7 +153,17 @@
 		/>
 	</p>
 
-	{#if !ocr.isAvailable() && unavailableReason}
+	{#if isTauriRuntime() && tesseractReady === false}
+		<p class="ocr-status ocr-status--info" role="status">
+			{#if tesseractInstalled === true}
+				Tesseract est détecté. Il manque le pack français <code>fra</code>. Vérifiez avec
+				<code>tesseract --list-langs</code>, puis relancez Accessible.
+			{:else}
+				Installez Tesseract OCR et le pack français <code>fra</code>, puis relancez Accessible.
+			{/if}
+		</p>
+		<TesseractInstallGuide show />
+	{:else if !ocr.isAvailable() && unavailableReason}
 		<p class="ocr-status ocr-status--info" role="status">{unavailableReason}</p>
 		<TesseractInstallGuide show={isTauriRuntime() && tesseractReady === false} />
 	{/if}

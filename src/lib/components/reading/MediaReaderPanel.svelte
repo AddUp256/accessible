@@ -212,6 +212,11 @@
 	</div>
 	{#if transcriptionUnavailable}
 		<p class="media-status media-status--info" role="status">{transcriptionUnavailable}</p>
+	{:else if isTauriRuntime()}
+		<p class="media-status media-status--info">
+			La transcription automatique utilise Whisper local. Si le bouton signale un module manquant,
+			installez FFmpeg, whisper.cpp et le modèle depuis Paramètres > Modules optionnels.
+		</p>
 	{/if}
 
 	{#if status}

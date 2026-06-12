@@ -11,9 +11,12 @@ const QUIT_FLUSH_TIMEOUT_MS = 1800;
 
 /** Enregistre le profil actif avant fermeture. */
 export async function flushProfileState(profile?: AccessibleProfile): Promise<void> {
-	const snapshot = profile ?? get(profileStore);
-	if (snapshot.privacy.guestMode) return;
-	await saveProfileAsync(snapshot);
+	if (!profile) {
+		await profileStore.flushPendingSaves();
+		return;
+	}
+	if (profile.privacy.guestMode) return;
+	await saveProfileAsync(profile);
 }
 
 async function flushProfileStateBeforeQuit(): Promise<void> {
@@ -71,7 +74,7 @@ export async function bindAppLifecycle(): Promise<() => void> {
 	const onBeforeUnload = () => {
 		const profile = get(profileStore);
 		if (!profile.privacy.guestMode) {
-			void saveProfileAsync(profile);
+			void profileStore.flushPendingSaves();
 		}
 	};
 	window.addEventListener('beforeunload', onBeforeUnload);
