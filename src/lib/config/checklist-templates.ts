@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Checklist Templates : donn?es m?tier sans effet de bord. */
 /** Modèles de checklists FALC — point de départ rapide. */
 
 export interface ChecklistTemplate {

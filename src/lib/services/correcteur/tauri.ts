@@ -1,3 +1,4 @@
+/** R?le : Service de correction orthographique et grammaticale : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { invoke } from '@tauri-apps/api/core';
 import type { SpellingIssue } from './types';
 

@@ -1,3 +1,4 @@
+/** R?le : Pack i18n typ? Index : traductions explicites pour l?interface bilingue. */
 import type { ExtendedUiKey } from '../../ui-extended';
 import type { ModuleLocaleCode } from '../modules';
 import { EXTENDED_AR } from './ar';

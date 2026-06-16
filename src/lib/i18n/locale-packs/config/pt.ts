@@ -1,3 +1,4 @@
+/** R?le : Pack i18n typ? Pt : traductions explicites pour l?interface bilingue. */
 import type { ConfigKey } from '../../ui-config';
 
 export const CONFIG_PT: Record<ConfigKey, string> = {

@@ -1,7 +1,7 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes : assemble l?interface utilisateur et les actions de cette zone.
+
 	import ReadAloudButton from '$lib/components/ui/ReadAloudButton.svelte';
-	import TeacherHomePanel from '$lib/components/home/TeacherHomePanel.svelte';
-	import ExpertHomePanel from '$lib/components/home/ExpertHomePanel.svelte';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import BilingualText from '$lib/components/ui/BilingualText.svelte';
@@ -55,9 +55,6 @@
 		text={welcomeSpeech}
 	/>
 </section>
-
-<TeacherHomePanel />
-<ExpertHomePanel />
 
 {#if shouldShowPersonalizationStart}
 	<section class="personalization-start card" aria-labelledby="personalization-start-heading">

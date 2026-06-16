@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Bilingual : s?lection, repli et chargement des textes bilingues. */
 import type { UISettings } from '$lib/types/profile';
 
 import { getBilingualSecondaryTranslation, getUiTranslation, type UiKey } from './ui-translations';
@@ -19,7 +20,7 @@ export function bilingualUi(
 	return { primary: french, secondary: translated };
 }
 
-/** Single-line label for selects, options, and buttons that cannot nest BilingualText. */
+/** Libell? sur une ligne pour selects, options et boutons qui ne peuvent pas contenir BilingualText. */
 export function bilingualLabel(
 	french: string,
 	key: UiKey,

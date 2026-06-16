@@ -1,5 +1,5 @@
+/** R?le : Aide i18n Ui Translations : s?lection, repli et chargement des textes bilingues. */
 import { getRuntimeUiTranslation } from './language-pack-runtime';
-import { isPriorityLanguage } from './priority-languages';
 import { UI_ES_PACK } from './ui-es-pack';
 import { EXTENDED_EN, EXTENDED_FR, EXTENDED_UI_KEYS } from './ui-extended';
 import { PANEL_EN, PANEL_FR, PANEL_UI_KEYS } from './ui-panels';
@@ -388,6 +388,5 @@ export function getBilingualSecondaryTranslation(key: UiKey, lang: string): stri
 	if (lang === 'en') return UI_TRANSLATIONS.en[key];
 	const fromPack = getRuntimeUiTranslation(key, lang);
 	if (fromPack) return fromPack;
-	if (isPriorityLanguage(lang)) return undefined;
-	return UI_TRANSLATIONS_EXPLICIT[lang]?.[key];
+	return undefined;
 }

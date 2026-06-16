@@ -1,3 +1,4 @@
+/** R?le : Service de lecture vocale : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { convertFileSrc } from '@tauri-apps/api/core';
 
 import { browser } from '$app/environment';
@@ -563,14 +564,14 @@ export class TauriTTSService implements TTSService {
 
 			} catch {
 
-				// Fall back to the system output when the selected device is unavailable.
+				// Revenir ? la sortie syst?me quand le p?riph?rique choisi est indisponible.
 
 			}
 
 			try {
 				await this.primeAudio(audio);
 			} catch {
-				// If priming is blocked, try the audible playback path anyway.
+				// Si l?amor?age est bloqu?, tenter quand m?me la lecture audible.
 			}
 
 

@@ -1,3 +1,4 @@
+/** R?le : Pack i18n typ? Pt : traductions explicites pour l?interface bilingue. */
 import type { PanelUiKey } from '../../ui-panels';
 
 export const PANEL_PT: Partial<Record<PanelUiKey, string>> = {

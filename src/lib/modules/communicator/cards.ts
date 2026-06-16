@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de communication CAA : fonctions pures ou r?gles locales testables hors interface. */
 import type {
 	CommunicationCardOverride,
 	CommunicatorData,

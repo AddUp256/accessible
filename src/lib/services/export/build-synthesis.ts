@@ -1,3 +1,4 @@
+/** R?le : Service de export local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { getAccommodationsForNeeds } from '$lib/config/accommodations';
 import { FLE_LEXICON } from '$lib/config/fle-lexicon';
 import { BUILT_IN_COMMUNICATION_CARDS } from '$lib/config/communication-cards';

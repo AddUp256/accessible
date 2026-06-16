@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de compr?hension des consignes : fonctions pures ou r?gles locales testables hors interface. */
 import type { GlossaryEntry } from '$lib/types/profile';
 
 const SIMPLE_REPLACEMENTS: Record<string, string> = {
@@ -84,7 +85,7 @@ export function simplifyToFalcLegacy(
 	return parts.join('\n\n');
 }
 
-/** @deprecated use simplifyWithFalcEngine from falc-engine.ts */
+/** @deprecated utiliser simplifyWithFalcEngine depuis falc-engine.ts */
 export function simplifyToFalc(text: string, glossary: GlossaryEntry[] = []): string {
 	return simplifyToFalcLegacy(text, glossary);
 }

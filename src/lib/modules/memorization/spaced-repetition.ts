@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de m?morisation : fonctions pures ou r?gles locales testables hors interface. */
 import type { Flashcard, FlashcardSchedule } from '$lib/types/profile';
 
 export type ReviewRating = 'hard' | 'good' | 'easy';

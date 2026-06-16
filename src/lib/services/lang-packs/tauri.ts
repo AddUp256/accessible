@@ -1,3 +1,4 @@
+/** R?le : Service de packs de langue : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { invoke } from '@tauri-apps/api/core';
 
 import type { LanguagePackPayload } from '$lib/i18n/language-pack-types';

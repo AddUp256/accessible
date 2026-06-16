@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de lecture adapt?e : fonctions pures ou r?gles locales testables hors interface. */
 /** Découpage syllabique français simplifié (heuristique, pas lexicographique). */
 const VOWELS = /[aeiouyàâäéèêëïîôùûüæœ]/i;
 const VOWEL_CLUSTER = /[aeiouyàâäéèêëïîôùûüæœ]+/gi;

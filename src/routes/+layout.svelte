@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Layout global de la route /routes : assemble navigation, accessibilit? et rendu enfant.
+
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import '../app.css';
@@ -8,6 +10,7 @@
 	import UnlockOverlay from '$lib/components/security/UnlockOverlay.svelte';
 	import { profileStore, settings } from '$lib/stores/profile';
 	import { initProfileFromStorage } from '$lib/services/storage/local';
+	import { checkReleaseAtStartup } from '$lib/services/releases';
 	import { refreshProfileSummaries } from '$lib/stores/profile-profiles';
 	import { isTauriRuntime } from '$lib/services/storage/tauri';
 	import { bindAppLifecycle } from '$lib/services/app-lifecycle';
@@ -64,6 +67,7 @@
 			const ui = get(settings).ui;
 			await ensureSecondaryLanguagePack(ui.secondaryLanguage, ui.bilingualUi);
 			storageReady = true;
+			void checkReleaseAtStartup();
 		})();
 
 		const onVisible = () => {

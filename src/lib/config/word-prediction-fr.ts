@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Word Prediction Fr : donn?es m?tier sans effet de bord. */
 /** Mots fréquents + suites courantes — prédiction locale, pas de cloud. */
 
 export const COMMON_FRENCH_WORDS: readonly string[] = [

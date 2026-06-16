@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Ui Config : s?lection, repli et chargement des textes bilingues. */
 import type { ToolId } from '$lib/types/profile';
 
 import type { UiKey } from './ui-translations';

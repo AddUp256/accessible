@@ -1,3 +1,4 @@
+/** R?le : Service de export local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { createZipBlob } from './zip-store';
 import { blocksToOdtContentXml, type DocumentBlock } from './document-content';
 

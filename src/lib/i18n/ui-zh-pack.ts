@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Ui Zh Pack : s?lection, repli et chargement des textes bilingues. */
 import type { UiKey } from './ui-translations';
 
 /** 简体中文界面译文（双语界面 — 不回落英语）。与 UI_DE_PACK 键一一对应。 */

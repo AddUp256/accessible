@@ -1,3 +1,4 @@
+/** R?le : Service de stockage local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { ENVELOPE_FORMAT, PBKDF2_ITERATIONS, type EncryptedEnvelope } from './types';
 
 const SALT_BYTES = 16;

@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/enseignant : assemble l?interface utilisateur et les actions de cette zone.
+
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import BilingualText from '$lib/components/ui/BilingualText.svelte';

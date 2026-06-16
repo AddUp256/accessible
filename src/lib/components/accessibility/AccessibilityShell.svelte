@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de accessibilit? globale : encapsule l?affichage et les interactions r?utilisables.
+
 	import { settings } from '$lib/stores/profile';
 	import { confirmDynamicMessage, type DynamicKey } from '$lib/i18n';
 

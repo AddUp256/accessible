@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Instruction Templates : donn?es m?tier sans effet de bord. */
 /** Exemples de consignes pour tester le découpage. */
 
 export interface InstructionTemplate {

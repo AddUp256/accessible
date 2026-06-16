@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de compr?hension des consignes : fonctions pures ou r?gles locales testables hors interface. */
 import type { ComprehensionData, GlossaryEntry } from '$lib/types/profile';
 import { createId } from '$lib/modules/organizer/checklist';
 

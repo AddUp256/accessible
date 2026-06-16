@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de profil et personnalisation : fonctions pures ou r?gles locales testables hors interface. */
 import type { DashboardAction } from '$lib/config/dashboard-actions';
 import { NAV_ZONES } from '$lib/config/dashboard-actions';
 import type {

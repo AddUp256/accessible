@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/organiser : assemble l?interface utilisateur et les actions de cette zone.
+
 
 	import ChecklistCard from '$lib/components/organizer/ChecklistCard.svelte';
 	import FocusTimer from '$lib/components/organizer/FocusTimer.svelte';

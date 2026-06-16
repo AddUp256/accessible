@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/memoriser : assemble l?interface utilisateur et les actions de cette zone.
+
 	import FlashcardStudy from '$lib/components/memorization/FlashcardStudy.svelte';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
@@ -32,6 +34,8 @@
 	const selectedDeck = $derived(
 		selectedDeckId ? decks.find((deck) => deck.id === selectedDeckId) : null
 	);
+	const ankiExportHelp =
+		'Télécharge un fichier CSV compatible avec l’import Anki : recto, verso et nom du deck. Importez ensuite ce fichier dans Anki sur votre ordinateur.';
 
 	function createEmptyDeck() {
 		if (!newDeckTitle.trim()) {
@@ -202,9 +206,16 @@
 		<h3 id="card-add-heading">Ajouter une carte — {selectedDeck.title}</h3>
 
 		<div class="deck-export">
-			<button type="button" class="btn btn-secondary" onclick={() => exportDeckAnki(selectedDeck)}>
+			<button
+				type="button"
+				class="btn btn-secondary"
+				title={ankiExportHelp}
+				aria-describedby="anki-export-help"
+				onclick={() => exportDeckAnki(selectedDeck)}
+			>
 				<BiText fr="Exporter CSV Anki" key="mod.memorize.exportAnki" inline />
 			</button>
+			<p id="anki-export-help" class="anki-export-help">{ankiExportHelp}</p>
 		</div>
 
 		<label for="card-front">Recto (question)</label>
@@ -244,6 +255,13 @@
 <style>
 	.deck-export {
 		margin-bottom: var(--space-md);
+	}
+
+	.anki-export-help {
+		max-width: 42rem;
+		margin: var(--space-xs) 0 0;
+		color: var(--color-text-muted);
+		font-size: var(--font-size-sm);
 	}
 
 	.deck-create label,

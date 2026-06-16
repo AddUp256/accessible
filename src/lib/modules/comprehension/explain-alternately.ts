@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de compr?hension des consignes : fonctions pures ou r?gles locales testables hors interface. */
 import { breakdownInstruction } from './instruction-breakdown';
 import { simplifyWithFalcEngine, type FalcOptions } from './falc-engine';
 

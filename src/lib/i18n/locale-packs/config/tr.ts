@@ -1,6 +1,7 @@
+/** R?le : Pack i18n typ? Tr : traductions explicites pour l?interface bilingue. */
 import type { ConfigKey } from '../../ui-config';
 
-/** Config / onboarding strings (Turkish). */
+/** Textes de configuration et d?onboarding (turc). */
 export const CONFIG_TR: Record<ConfigKey, string> = {
 	'cfg.tool.read_adapted.label': 'Daha kolay okuma',
 	'cfg.tool.read_adapted.desc': 'Metni konforunuza uyarlayın.',

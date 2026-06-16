@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Setting Presets : donn?es m?tier sans effet de bord. */
 import type { SettingPreset } from '$lib/types/profile';
 
 /**

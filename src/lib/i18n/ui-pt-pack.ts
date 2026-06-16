@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Ui Pt Pack : s?lection, repli et chargement des textes bilingues. */
 import type { UiKey } from './ui-translations';
 
 /** Traduções portuguesas explícitas (interface bilingue — sem recurso ao inglês). Espelho de UI_DE_PACK. */

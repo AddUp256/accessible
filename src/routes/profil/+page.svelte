@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/profil : assemble l?interface utilisateur et les actions de cette zone.
+
 	import { profileStore } from '$lib/stores/profile';
 	import { MEDICAL_PROFILES_BY_ID } from '$lib/config/medical-profiles';
 	import { FUNCTIONAL_NEEDS_BY_ID } from '$lib/config/functional-needs';

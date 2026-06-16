@@ -1,3 +1,4 @@
+/** R?le : Pack i18n typ? Uk : traductions explicites pour l?interface bilingue. */
 import type { PanelUiKey } from '../../ui-panels';
 
 

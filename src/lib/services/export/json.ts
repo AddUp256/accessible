@@ -1,3 +1,4 @@
+/** R?le : Service de export local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { exportProfileJson } from '$lib/services/storage/local';
 import type { AccessibleProfile } from '$lib/types/profile';
 import { profileForExport } from './build-synthesis';

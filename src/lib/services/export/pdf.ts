@@ -1,3 +1,4 @@
+/** R?le : Service de export local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { jsPDF } from 'jspdf';
 import type { AccessibleProfile } from '$lib/types/profile';
 import {

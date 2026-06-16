@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de communication CAA : encapsule l?affichage et les interactions r?utilisables.
+
 	import { arasaacPictogramImageUrl } from '$lib/config/arasaac';
 	import CommunicationCardDisplay from '$lib/components/communicator/CommunicationCardDisplay.svelte';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';

@@ -149,6 +149,19 @@ Aucune copie distante à supprimer (il n'y en a pas).
 Accessible V1 ne traite pas de données personnelles côté serveur (pas de serveur).  
 Les données locales sont sous contrôle exclusif de l'utilisateur.
 
+### Informations essentielles
+
+- **Responsable éditorial pressenti :** Atelier Eden.
+- **Contact :** contact@atelier-eden.pro.
+- **Base de traitement :** utilisation volontaire de l'application par l'utilisateur, conservation locale sous son contrôle.
+- **Finalités :** personnalisation de l'interface, mémorisation de préférences, notes locales, exports de synthèse et paramètres d'accessibilité.
+- **Données sensibles :** Accessible peut contenir des préférences ou déclarations liées à des difficultés fonctionnelles si l'utilisateur les saisit. Ces informations restent locales et ne doivent être partagées qu'avec des personnes de confiance.
+- **Destinataires :** aucun destinataire serveur par défaut. Les destinataires sont choisis par l'utilisateur lorsqu'il exporte ou partage un fichier.
+- **Durée de conservation :** jusqu'à suppression locale par l'utilisateur, réinitialisation du profil, mode invité ou suppression manuelle des exports.
+- **Droits :** accès, rectification, suppression et portabilité s'exercent directement dans l'application via consultation, modification, export JSON et suppression des données.
+- **Transfert hors UE :** aucun transfert par Accessible par défaut. Les services tiers utilisés volontairement par l'utilisateur peuvent appliquer leurs propres règles.
+- **Adresse postale / représentant légal :** à compléter avant publication juridique.
+
 Recommandations affichées à l'utilisateur :
 - Ne partagez un export PDF/JSON qu'avec des personnes de confiance
 - Supprimez les exports obsolètes de votre appareil
@@ -158,7 +171,7 @@ Recommandations affichées à l'utilisateur :
 
 ## Contact / responsable
 
-À compléter lors de la publication (éditeur, contact DPO si applicable).
+Atelier Eden — contact@atelier-eden.pro. Adresse postale, représentant légal et DPO éventuel à compléter avant publication juridique.
 
 ---
 

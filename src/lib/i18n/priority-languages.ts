@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Priority Languages : s?lection, repli et chargement des textes bilingues. */
 /**
  * Langues prioritaires pour l'interface bilingue (ligne secondaire sans repli anglais).
  * Ordre : espagnol d'abord (à maintenir complet), puis les autres langues cibles.

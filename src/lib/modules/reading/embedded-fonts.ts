@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de lecture adapt?e : fonctions pures ou r?gles locales testables hors interface. */
 /** Polices redistribuables embarquées (SIL OFL) — hors ligne, sans Google Fonts. */
 import '@fontsource/atkinson-hyperlegible/400.css';
 import '@fontsource/atkinson-hyperlegible/700.css';

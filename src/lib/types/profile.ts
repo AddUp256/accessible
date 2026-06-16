@@ -1,3 +1,4 @@
+/** R?le : Types TypeScript Profile : contrat partag? entre modules, pages et stockage. */
 /** Types de données Accessible v1.0 — voir DATA_MODEL.md */
 
 export type AppMode = 'student' | 'companion' | 'teacher' | 'verySimple' | 'expert';
@@ -285,6 +286,7 @@ export interface OnboardingState {
 	path: 'known' | 'declared' | 'discovery' | null;
 	completedSteps: string[];
 	comparisons: ComparisonResult[];
+	diagnosticAnswers: string[];
 }
 
 export interface PrivacySettings {

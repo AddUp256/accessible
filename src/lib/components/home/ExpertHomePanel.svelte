@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de accueil : encapsule l?affichage et les interactions r?utilisables.
+
 	import { profileStore, settings } from '$lib/stores/profile';
 	import { EXPERT_DASHBOARD_ACTIONS } from '$lib/config/dashboard-actions';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';

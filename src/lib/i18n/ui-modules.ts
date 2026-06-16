@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Ui Modules : s?lection, repli et chargement des textes bilingues. */
 /** Module panel UI keys (Phase 36). */
 export const MODULE_UI_KEYS = [
 	'mod.common.settings',
@@ -329,7 +330,7 @@ export const MODULE_FR: Record<ModuleUiKey, string> = {
 		'Installez Hunspell et le dictionnaire français (fr_FR) pour l\'orthographe.',
 	'mod.write.correct.grammalecteReady': 'Grammalecte est prêt (grammaire).',
 	'mod.write.correct.grammalecteMissing':
-		'Installez Grammalecte (CLI) ou définissez GRAMMALECTE_CLI pour la grammaire.',
+		'Installez Grammalecte CLI/Serveur ou définissez GRAMMALECTE_CLI vers grammar_checker.py pour la grammaire.',
 	'mod.write.correct.analyze': 'Analyser le texte',
 	'mod.write.correct.analyzeBusy': 'Analyse…',
 	'mod.write.correct.checkLong': 'Vérifier les phrases longues',

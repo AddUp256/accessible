@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Languages : s?lection, repli et chargement des textes bilingues. */
 import { PRIORITY_LANGUAGE_CODES, PRIORITY_LANGUAGE_SET } from './priority-languages';
 
 /** Langues disponibles pour l'interface bilingue (français + langue choisie). */

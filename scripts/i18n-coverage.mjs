@@ -1,6 +1,7 @@
+/** R?le : Script de maintenance I18n Coverage pour automatiser les t?ches du d?p?t. */
 /**
  * Rapport de couverture des packs explicites (interface bilingue).
- * Usage: npm run i18n:coverage
+ * Utilisation: npm run i18n:coverage
  */
 import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

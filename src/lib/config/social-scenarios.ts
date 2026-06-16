@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Social Scenarios : donn?es m?tier sans effet de bord. */
 /** Scénarios sociaux CAA multi-étapes (Phase 42). */
 
 export interface SocialScenarioStep {

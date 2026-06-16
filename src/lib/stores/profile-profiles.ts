@@ -1,3 +1,4 @@
+/** R?le : Store Svelte Profile Profiles : centralise l??tat partag? et sa persistance. */
 import { writable } from 'svelte/store';
 
 import { fetchActiveProfileId, fetchStoredProfiles, type StoredProfileSummary } from '$lib/services/storage/local';

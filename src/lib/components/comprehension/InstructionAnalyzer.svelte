@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de compr?hension des consignes : encapsule l?affichage et les interactions r?utilisables.
+
 	import ExplainAgainPanel from '$lib/components/comprehension/ExplainAgainPanel.svelte';
 	import ReadAloudButton from '$lib/components/ui/ReadAloudButton.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';

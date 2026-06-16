@@ -1,3 +1,4 @@
+/** R?le : Pack i18n typ? Tr : traductions explicites pour l?interface bilingue. */
 import type { ModuleUiKey } from '../../ui-modules';
 
 export const MODULE_TR: Record<ModuleUiKey, string> = {

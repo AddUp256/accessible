@@ -1,3 +1,4 @@
+/** R?le : Service de stockage local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import {
 	PROFILE_VERSION,
 	type AccessibleProfile,
@@ -93,7 +94,10 @@ export function migrateProfile(raw: unknown): AccessibleProfile {
 					? raw.onboarding.path
 					: null,
 			completedSteps: Array.isArray(onboarding.completedSteps) ? onboarding.completedSteps : [],
-			comparisons: Array.isArray(onboarding.comparisons) ? onboarding.comparisons : []
+			comparisons: Array.isArray(onboarding.comparisons) ? onboarding.comparisons : [],
+			diagnosticAnswers: Array.isArray(onboarding.diagnosticAnswers)
+				? onboarding.diagnosticAnswers.filter((value): value is string => typeof value === 'string')
+				: []
 		},
 		activatedTools: Array.isArray(raw.activatedTools) ? raw.activatedTools : [],
 		privacy: {

@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de accessibilit? globale : encapsule l?affichage et les interactions r?utilisables.
+
 	import { toastMessage } from '$lib/services/notifications';
 </script>
 

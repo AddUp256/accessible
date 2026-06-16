@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Communication Cards : donn?es m?tier sans effet de bord. */
 /** Cartes de communication augmentée (CAA) — texte + emoji, pas de diagnostic. */
 
 export type CommunicationCardCategory = 'besoin' | 'emotion' | 'ecole' | 'social';

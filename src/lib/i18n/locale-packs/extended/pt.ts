@@ -1,3 +1,4 @@
+/** R?le : Pack i18n typ? Pt : traductions explicites pour l?interface bilingue. */
 import type { ExtendedUiKey } from '../../ui-extended';
 
 export const EXTENDED_PT: Partial<Record<ExtendedUiKey, string>> = {

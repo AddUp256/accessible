@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de accueil : encapsule l?affichage et les interactions r?utilisables.
+
 	import { profileStore, settings } from '$lib/stores/profile';
 	import { TEACHER_DASHBOARD_ACTIONS } from '$lib/config/dashboard-actions';
 	import BiText from '$lib/components/ui/BiText.svelte';

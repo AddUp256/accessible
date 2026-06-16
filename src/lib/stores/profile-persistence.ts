@@ -1,3 +1,4 @@
+/** R?le : Store Svelte Profile Persistence : centralise l??tat partag? et sa persistance. */
 export interface ProfilePersistenceState {
 	persistEnabled: boolean;
 	storageHydrated: boolean;

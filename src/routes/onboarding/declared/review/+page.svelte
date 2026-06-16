@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/onboarding/declared/review : assemble l?interface utilisateur et les actions de cette zone.
+
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { get } from 'svelte/store';

@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de ?criture assist?e : encapsule l?affichage et les interactions r?utilisables.
+
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import { settings, profileStore } from '$lib/stores/profile';

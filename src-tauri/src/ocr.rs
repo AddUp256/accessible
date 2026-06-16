@@ -1,3 +1,4 @@
+//! R?le : Module Rust Ocr : commandes natives et pont syst?me pour Accessible.
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;

@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/onboarding/comfort : assemble l?interface utilisateur et les actions de cette zone.
+
 	import ComfortPanel from '$lib/components/onboarding/ComfortPanel.svelte';
 	import ReadingPane from '$lib/components/reading/ReadingPane.svelte';
 	import StepProgress from '$lib/components/ui/StepProgress.svelte';

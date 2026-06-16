@@ -1,4 +1,5 @@
-/** Dynamic status, toast, and service messages (Phase 38.1). */
+﻿/** R?le : Aide i18n Ui Dynamic : s?lection, repli et chargement des textes bilingues. */
+/** Messages dynamiques de statut, toasts et services (Phase 38.1). */
 export const DYNAMIC_UI_KEYS = [
 	'dyn.common.confirmAction',
 	'dyn.comm.routineImported',
@@ -311,7 +312,7 @@ export const DYNAMIC_FR: Record<DynamicKey, string> = {
 	'dyn.service.hunspellMissing':
 		'Hunspell n\'est pas installé ou introuvable. Installez Hunspell avec le dictionnaire français (fr_FR), puis relancez l\'application.',
 	'dyn.service.grammalecteMissing':
-		'Grammalecte n\'est pas installé. Installez Grammalecte (CLI) ou définissez GRAMMALECTE_CLI vers grammalecte-cli.py, puis relancez.',
+		'Grammalecte n\'est pas installé. Installez Grammalecte CLI/Serveur ou définissez GRAMMALECTE_CLI vers grammar_checker.py, puis relancez.',
 	'dyn.settings.saved': 'Réglages enregistrés.',
 	'dyn.settings.guestNotSaved': 'Modifications non enregistrées (mode invité).',
 	'dyn.settings.deleteConfirm': 'Supprimer toutes les données ?',
@@ -487,7 +488,7 @@ export const DYNAMIC_EN: Record<DynamicKey, string> = {
 	'dyn.service.hunspellMissing':
 		'Hunspell is not installed or not found. Install Hunspell with the French dictionary (fr_FR), then restart the app.',
 	'dyn.service.grammalecteMissing':
-		'Grammalecte is not installed. Install Grammalecte (CLI) or set GRAMMALECTE_CLI to grammalecte-cli.py, then restart.',
+		'Grammalecte is not installed. Install Grammalecte (CLI) or set GRAMMALECTE_CLI to grammar_checker.py, then restart.',
 	'dyn.settings.saved': 'Settings saved.',
 	'dyn.settings.guestNotSaved': 'Changes not saved (guest mode).',
 	'dyn.settings.deleteConfirm': 'Delete all data?',

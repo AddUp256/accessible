@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Ui Extended : s?lection, repli et chargement des textes bilingues. */
 /** Additional UI keys for full-app bilingual rollout (Phase 34). */
 export const EXTENDED_UI_KEYS = [
 	'home.welcome.line1',

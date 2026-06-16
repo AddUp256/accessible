@@ -1,3 +1,4 @@
+/** R?le : Extension Registry : registre ou exemple de plugin int?gr?. */
 export interface PluginAction {
 	id: string;
 	href: string;
@@ -35,7 +36,7 @@ export function registerPlugin(plugin: AccessiblePlugin): void {
 
 export function initPlugins(): void {
 	for (const plugin of plugins) {
-		/* already registered */
+		/* D?j? enregistr?. */
 	}
 }
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/onboarding/known : assemble l?interface utilisateur et les actions de cette zone.
+
 
 	import StepProgress from '$lib/components/ui/StepProgress.svelte';
 

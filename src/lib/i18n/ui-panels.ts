@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Ui Panels : s?lection, repli et chargement des textes bilingues. */
 /** Panel-level UI keys (Phase 35). */
 export const PANEL_UI_KEYS = [
 	'panel.appMode.title',

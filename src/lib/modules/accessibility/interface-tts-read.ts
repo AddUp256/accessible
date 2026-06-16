@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de accessibilit? globale : fonctions pures ou r?gles locales testables hors interface. */
 const MAX_ELEMENT_CHARS = 600;
 const SKIP_SELECTOR =
 	'[data-interface-tts-skip], [data-interface-tts-overlay], script, style, noscript';

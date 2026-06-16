@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Ui It Pack : s?lection, repli et chargement des textes bilingues. */
 import type { UiKey } from './ui-translations';
 
 /** Traduzioni italiane esplicite (interfaccia bilingue — senza ripiego sull'inglese). Specchio di UI_DE_PACK. */

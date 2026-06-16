@@ -1,3 +1,4 @@
+/** R?le : Service de lecture vocale : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 export type TTSEngine = 'auto' | 'web' | 'piper' | 'espeak';
 
 export interface TTSOptions {
@@ -21,7 +22,7 @@ export interface TTSService {
 		espeakReason: string | null;
 	};
 	refreshEngineStatus?(): Promise<void>;
-	/** @deprecated use refreshEngineStatus */
+	/** @deprecated utiliser refreshEngineStatus */
 	refreshPiperStatus?(): Promise<void>;
 	speak(text: string, options?: TTSOptions): boolean;
 	stop(): void;

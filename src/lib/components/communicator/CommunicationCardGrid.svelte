@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de communication CAA : encapsule l?affichage et les interactions r?utilisables.
+
 	import {
 		BUILT_IN_COMMUNICATION_CARDS,
 		COMMUNICATION_CARD_CATEGORIES,

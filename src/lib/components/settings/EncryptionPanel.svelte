@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de param?tres : encapsule l?affichage et les interactions r?utilisables.
+
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';

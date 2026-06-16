@@ -1,3 +1,4 @@
+/** R?le : Service de stockage local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import Database from '@tauri-apps/plugin-sql';
 
 import { isTauriRuntime, tauriGetSqliteDbUri } from '../tauri';

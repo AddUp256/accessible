@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/lire : assemble l?interface utilisateur et les actions de cette zone.
+
 	import FontComparator from '$lib/components/reading/FontComparator.svelte';
 	import MediaReaderPanel from '$lib/components/reading/MediaReaderPanel.svelte';
 	import ReadingControls from '$lib/components/reading/ReadingControls.svelte';

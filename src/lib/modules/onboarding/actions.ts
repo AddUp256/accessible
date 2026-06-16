@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de parcours d?accueil : fonctions pures ou r?gles locales testables hors interface. */
 import { profileStore } from '$lib/stores/profile';
 import type {
 	AccessibleProfile,

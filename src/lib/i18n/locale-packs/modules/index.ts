@@ -1,3 +1,4 @@
+/** R?le : Pack i18n typ? Index : traductions explicites pour l?interface bilingue. */
 import type { ModuleUiKey } from '../../ui-modules';
 import { MODULE_AR } from './ar';
 import { MODULE_DE } from './de';

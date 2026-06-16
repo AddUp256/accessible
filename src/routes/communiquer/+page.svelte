@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/communiquer : assemble l?interface utilisateur et les actions de cette zone.
+
 
 	import ArasaacPanel from '$lib/components/communicator/ArasaacPanel.svelte';
 

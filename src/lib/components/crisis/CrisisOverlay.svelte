@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de mode pause : encapsule l?affichage et les interactions r?utilisables.
+
 	import { CRISIS_CARDS } from '$lib/config/crisis-cards';
 	import { tts } from '$lib/services/tts';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';

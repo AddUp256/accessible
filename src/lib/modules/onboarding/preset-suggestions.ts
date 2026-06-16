@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de parcours d?accueil : fonctions pures ou r?gles locales testables hors interface. */
 import { SETTING_PRESETS_BY_MEDICAL_ID } from '$lib/config/setting-presets';
 import type {
 	AppSettings,

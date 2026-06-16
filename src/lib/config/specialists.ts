@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Specialists : donn?es m?tier sans effet de bord. */
 import type { SpecialistId, SpecialistRecommendation } from '$lib/types/profile';
 
 /** Labels FALC pour affichage — pas de formulation diagnostique. */

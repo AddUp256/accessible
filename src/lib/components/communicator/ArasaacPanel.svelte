@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de communication CAA : encapsule l?affichage et les interactions r?utilisables.
+
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import BilingualText from '$lib/components/ui/BilingualText.svelte';

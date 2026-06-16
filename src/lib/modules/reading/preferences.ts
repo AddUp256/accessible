@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de lecture adapt?e : fonctions pures ou r?gles locales testables hors interface. */
 import { get } from 'svelte/store';
 import { profileStore } from '$lib/stores/profile';
 import { addFunctionalNeeds } from '$lib/modules/onboarding/actions';

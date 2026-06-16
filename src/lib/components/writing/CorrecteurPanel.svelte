@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de ?criture assist?e : encapsule l?affichage et les interactions r?utilisables.
+
 	import { onMount } from 'svelte';
 	import { correcteur } from '$lib/services/correcteur';
 	import {
@@ -49,6 +51,13 @@
 	const spellcheckActive = $derived(spellcheckMode !== 'off');
 	const grammarActive = $derived(grammarCheckMode !== 'off');
 	const analysisActive = $derived(spellcheckActive || grammarActive);
+	const advancedCorrectionBlocked = $derived(
+		isTauriRuntime() &&
+			(hunspellReady === false || (grammarActive && grammalecteReady === false))
+	);
+	const showAdvancedInstallGuide = $derived(
+		!isTauriRuntime() || hunspellReady !== true || grammalecteReady !== true
+	);
 	const unavailableReasonDisplay = $derived(
 		unavailableReason ? translateServiceMessage(unavailableReason, $settings.ui) : null
 	);
@@ -219,7 +228,7 @@
 			<BiText fr="Grammalecte est prêt (grammaire)." key="mod.write.correct.grammalecteReady" inline />
 		{:else if isTauriRuntime() && grammalecteReady === false}
 			<BiText
-				fr="Installez Grammalecte (CLI) ou définissez GRAMMALECTE_CLI pour la grammaire."
+				fr="Installez Grammalecte CLI/Serveur ou définissez GRAMMALECTE_CLI vers grammar_checker.py pour la grammaire."
 				key="mod.write.correct.grammalecteMissing"
 			/>
 		{:else if !analysisActive && unavailableReasonDisplay}
@@ -237,6 +246,21 @@
 		{/if}
 	</p>
 
+	{#if advancedCorrectionBlocked}
+		<div class="correcteur-warning" role="status">
+			<p>
+				L'analyse complète est impossible actuellement parce qu'un module local manque. Ouvrez
+				Paramètres &gt; Installation et dépendances, copiez les commandes Hunspell + dictionnaire
+				français puis Grammalecte, fermez Accessible et relancez-le pour que DICPATH et
+				GRAMMALECTE_CLI soient relus.
+			</p>
+			<a class="btn btn-secondary" href="/parametres#installation">
+				Ouvrir les commandes d'installation
+			</a>
+		</div>
+	{/if}
+
+	{#if showAdvancedInstallGuide}
 	<details class="correcteur-install-guide">
 		<summary>Installer la correction avancée</summary>
 		<div class="install-guide-content">
@@ -270,12 +294,24 @@
 					<a href="https://grammalecte.net/" target="_blank" rel="noreferrer">
 						télécharger Grammalecte
 					</a>, puis indiquer le chemin du script CLI :
-					<code>setx GRAMMALECTE_CLI "C:\chemin\grammalecte-cli.py"</code>.
+					<code>setx GRAMMALECTE_CLI "C:\chemin\grammalecte\grammar_checker.py"</code>
+					ou <code>setx GRAMMALECTE_PATH "C:\chemin\grammalecte"</code>.
 				</li>
 			</ul>
-			<p>Après installation, fermez Accessible puis relancez-le pour rafraîchir la détection.</p>
+			<p>
+				Après installation, fermez Accessible puis relancez-le pour rafraîchir la détection. Si
+				l'analyse reste impossible, vérifiez que <code>DICPATH</code> pointe vers le dossier des
+				dictionnaires et que <code>GRAMMALECTE_CLI</code> pointe vers <code>grammar_checker.py</code>
+				ou que <code>GRAMMALECTE_PATH</code> pointe vers le dossier Grammalecte.
+			</p>
+			<p>
+				<a class="btn btn-secondary" href="/parametres#installation">
+					Ouvrir les commandes complètes dans Paramètres
+				</a>
+			</p>
 		</div>
 	</details>
+	{/if}
 
 	<button
 		type="button"
@@ -400,6 +436,22 @@
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius);
 		background: var(--color-bg-elevated);
+	}
+
+	.correcteur-warning {
+		display: grid;
+		gap: var(--space-sm);
+		margin: 0 0 var(--space-md);
+		padding: var(--space-sm) var(--space-md);
+		border: 1px solid var(--color-warning, #8a4b00);
+		border-radius: var(--radius);
+		background: var(--color-bg-elevated);
+	}
+
+	.correcteur-warning p {
+		margin: 0;
+		color: var(--color-text);
+		font-size: var(--font-size-sm);
 	}
 
 	.correcteur-install-guide summary {

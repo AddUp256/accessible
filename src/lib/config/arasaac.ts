@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Arasaac : donn?es m?tier sans effet de bord. */
 /** Métadonnées ARASAAC — pictogrammes non bundlés (licence NC). */
 
 export const ARASAAC_LICENSE_NOTICE =

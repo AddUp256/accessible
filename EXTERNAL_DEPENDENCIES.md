@@ -28,7 +28,7 @@ Accessible fonctionne **sans connexion Internet** et **sans moteurs externes** :
 ```powershell
 tesseract --version
 hunspell -h
-grammalecte-cli -h    # ou python grammalecte-cli.py -h
+py -3 -c "import grammalecte.grammar_checker as gc; print(gc.GrammarChecker('fr'))"
 piper --help
 espeak-ng --version
 whisper-cli --help
@@ -109,32 +109,35 @@ Si `fr_FR` est introuvable, installer les fichiers `fr_FR.dic` / `fr_FR.aff` dan
 
 **Utilisation :** `/ecrire` → correction grammaticale (en complément de Hunspell).
 
-**Détection :** `grammalecte-cli -h` dans le PATH, **ou** variable `GRAMMALECTE_CLI` pointant vers `grammalecte-cli.py` ou un exécutable.
+**Détection :** `grammalecte-cli -h` dans le PATH, **ou** variable `GRAMMALECTE_CLI` pointant vers `grammar_checker.py`, **ou** variable `GRAMMALECTE_PATH` pointant vers le dossier Python `grammalecte`.
 
 ### Windows 10/11 (via Python)
 
 ```powershell
-pip install grammalecte
+winget install --id Python.Python.3.12 --exact --source winget
+# Télécharger Grammalecte CLI & Serveur depuis https://www.grammalecte.net/
+# puis pointer Accessible vers le fichier grammar_checker.py.
+setx GRAMMALECTE_CLI "C:\chemin\grammalecte\grammar_checker.py"
+setx GRAMMALECTE_PATH "C:\chemin\grammalecte"
 ```
 
-Ajouter le dossier Scripts Python au PATH (adapter la version Python) :
+Vérifier que Python peut charger le paquet :
 
 ```powershell
-$env:Path += ";$env:LOCALAPPDATA\Programs\Python\Python312\Scripts"
-grammalecte-cli -h
+py -3 -c "import sys; sys.path.insert(0, r'C:\chemin'); import grammalecte.grammar_checker as gc; print(gc.GrammarChecker('fr').getParagraphErrorsAsJSON(0, 'Je suis aller a la maison.', bContext=True, bSpellSugg=True))"
 ```
 
-**Alternative — variable d’environnement :**
+**Alternative ancienne — script CLI :**
 
 ```powershell
 setx GRAMMALECTE_CLI "C:\chemin\vers\grammalecte-cli.py"
 ```
 
-Accessible tentera aussi `python grammalecte-cli.py` si le chemin se termine par `.py`.
+Accessible accepte encore `python grammalecte-cli.py` si une ancienne distribution fournit ce fichier.
 
 ### Linux
 
-Souvent disponible via le gestionnaire de paquets de la distribution, ou `pip install grammalecte` comme ci-dessus.
+Souvent disponible via le gestionnaire de paquets de la distribution, ou via l'archive CLI & Serveur officielle pointée par `GRAMMALECTE_PATH`.
 
 ---
 
@@ -264,7 +267,8 @@ ffmpeg -version
 | `PIPER_MODEL_TR` | Piper TTS (TR) | Voix turque (optionnel) |
 | `ESPEAK_VOICE` | eSpeak NG | Code voix (défaut `fr`) |
 | `WHISPER_MODEL` | Whisper | Chemin absolu vers un modèle Whisper (`.bin` / `.gguf`) |
-| `GRAMMALECTE_CLI` | Grammalecte (optionnel) | Chemin vers `grammalecte-cli.py` ou exécutable si absent du PATH |
+| `GRAMMALECTE_CLI` | Grammalecte (optionnel) | Chemin vers `grammar_checker.py`, ancien `grammalecte-cli.py` ou exécutable si absent du PATH |
+| `GRAMMALECTE_PATH` | Grammalecte (optionnel) | Chemin vers le dossier Python `grammalecte` contenant `grammar_checker.py` |
 
 Tesseract, Poppler (`pdftoppm`), Hunspell, ffmpeg et Whisper sont résolus via le **PATH** (sauf modèles Piper/Whisper).
 
@@ -321,7 +325,7 @@ Voir aussi [PRIVACY.md](./PRIVACY.md) et [PROJECT_STATUS.md](./PROJECT_STATUS.md
 | Whisper absent ou modèle manquant | `whisper-cli --help` + `WHISPER_MODEL` vers un fichier `.bin` existant |
 | Vidéo non transcrite | Installer `ffmpeg` et vérifier le PATH |
 | PDF scanné illisible | Installer Poppler (`pdftoppm`) ou exporter le PDF en images |
-| Grammalecte absent | `pip install grammalecte` + PATH Scripts Python ou `GRAMMALECTE_CLI` |
+| Grammalecte absent | Installer Grammalecte CLI & Serveur puis définir `GRAMMALECTE_CLI` vers `grammar_checker.py` ou `GRAMMALECTE_PATH` vers le dossier |
 
 ---
 

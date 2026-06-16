@@ -1,3 +1,4 @@
+//! R?le : Module Rust Espeak : commandes natives et pont syst?me pour Accessible.
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};

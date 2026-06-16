@@ -1,3 +1,4 @@
+/** R?le : Utilitaire Detail Level : r?gle transversale utilis?e par plusieurs zones. */
 import type { AccessibleProfile, AppSettings } from '$lib/types/profile';
 
 /** Réglages avancés visibles en mode expert uniquement. */

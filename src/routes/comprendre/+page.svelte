@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/comprendre : assemble l?interface utilisateur et les actions de cette zone.
+
 	import InstructionAnalyzer from '$lib/components/comprehension/InstructionAnalyzer.svelte';
 	import OnboardingTestReturn from '$lib/components/onboarding/OnboardingTestReturn.svelte';
 	import PersonalGlossaryPanel from '$lib/components/comprehension/PersonalGlossaryPanel.svelte';

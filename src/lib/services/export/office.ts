@@ -1,3 +1,4 @@
+/** R?le : Service de export local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import type { AccessibleProfile, FlashcardDeck, MindMap, Note } from '$lib/types/profile';
 
 import { buildAnkiCsvBytes } from './anki';

@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Card Translations : s?lection, repli et chargement des textes bilingues. */
 /** Traductions des cartes CAA intégrées (label + message). Le français reste la référence.
  * Langues prioritaires : es, ar, zh, it, pt, de, hi, uk, tr (+ en pour tests).
  */

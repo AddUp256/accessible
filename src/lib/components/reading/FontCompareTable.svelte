@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de lecture adapt?e : encapsule l?affichage et les interactions r?utilisables.
+
 	import { FONT_COMPARE_TABLE } from '$lib/config/fonts-catalog';
 	import { readingSettingsToStyle } from '$lib/modules/reading/font-stacks';
 	import type { ReadingSettings } from '$lib/types/profile';

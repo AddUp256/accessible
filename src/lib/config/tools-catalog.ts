@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Tools Catalog : donn?es m?tier sans effet de bord. */
 import type { ToolId } from '$lib/types/profile';
 
 export interface ToolCatalogEntry {

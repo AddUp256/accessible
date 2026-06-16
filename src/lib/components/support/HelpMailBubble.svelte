@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de support utilisateur : encapsule l?affichage et les interactions r?utilisables.
+
 	import { tick } from 'svelte';
 	import { page } from '$app/stores';
 
@@ -50,7 +52,7 @@
 	let open = $state(false);
 	let selectedType = $state<(typeof mailTypes)[number]['id']>('help');
 	let details = $state('');
-	let attachmentName = $state('');
+	let attachments = $state<File[]>([]);
 	let status = $state('');
 	let openerButton: HTMLButtonElement | null = $state(null);
 	let firstField: HTMLSelectElement | null = $state(null);
@@ -87,14 +89,13 @@
 
 	function onAttachmentSelected(event: Event) {
 		const input = event.currentTarget as HTMLInputElement;
-		const file = input.files?.[0];
-		attachmentName = file?.name ?? '';
+		attachments = input.files ? Array.from(input.files) : [];
 	}
 
 	function buildBody(): string {
 		const pageUrl = $page.url.pathname;
-		const attachmentLine = attachmentName
-			? `\n\nPièce jointe à ajouter manuellement : ${attachmentName}`
+		const attachmentLine = attachments.length
+			? `\n\nPièces jointes à ajouter manuellement : ${attachments.map((file) => file.name).join(', ')}`
 			: '';
 		const detailBlock = details.trim() || 'Décrivez ici ce qui se passe, ce que vous faisiez, et ce que vous attendiez.';
 
@@ -109,7 +110,7 @@
 			'',
 			'Merci.',
 			'',
-			'Note : Accessible ne joint pas automatiquement les fichiers depuis ce bouton. Ajoutez la pièce jointe dans votre messagerie avant l’envoi si nécessaire.'
+			'Note : Accessible ne joint pas automatiquement les fichiers avec un mailto. Ajoutez les pièces jointes dans votre messagerie avant l’envoi si nécessaire.'
 		].join('\n');
 	}
 
@@ -122,10 +123,30 @@
 	}
 
 	function prepareMail() {
-		status = attachmentName
-			? 'Le mail va s’ouvrir prérempli. Ajoutez la pièce jointe dans votre messagerie avant l’envoi.'
+		status = attachments.length
+			? 'Le mail va s’ouvrir prérempli. Ajoutez les fichiers sélectionnés dans votre messagerie avant l’envoi.'
 			: 'Le mail va s’ouvrir prérempli.';
 		window.location.href = mailtoUrl();
+	}
+
+	async function shareWithAttachments() {
+		const shareData = {
+			title: `[Accessible] ${selectedMailType.subject}`,
+			text: buildBody(),
+			files: attachments
+		};
+		if (!attachments.length || !navigator.canShare?.(shareData)) {
+			status =
+				'Le partage direct avec fichiers n’est pas disponible ici. Préparez le mail puis ajoutez les fichiers dans votre messagerie.';
+			return;
+		}
+		try {
+			await navigator.share(shareData);
+			status = 'Partage ouvert avec les fichiers sélectionnés.';
+		} catch {
+			status =
+				'Partage annulé ou indisponible. Vous pouvez préparer le mail puis joindre les fichiers manuellement.';
+		}
 	}
 
 	async function copyMessage() {
@@ -175,7 +196,7 @@
 
 			<p id="support-mail-hint" class="support-hint">
 				Prépare un mail à {CONTACT_EMAIL}. Choisissez le sujet, ajoutez une précision et, si besoin,
-				joignez une capture dans votre messagerie.
+				joignez une ou plusieurs captures dans votre messagerie.
 			</p>
 
 			<label class="support-field" for="support-mail-type">
@@ -202,19 +223,28 @@
 				<input
 					id="support-mail-attachment"
 					type="file"
+					multiple
 					accept="image/*,.pdf,.txt,.log,.json,.zip"
 					onchange={onAttachmentSelected}
 				/>
 			</label>
-			{#if attachmentName}
+			{#if attachments.length}
 				<p class="support-hint">
-					Fichier sélectionné : <strong>{attachmentName}</strong>. Il faudra l’ajouter dans la
-					messagerie ouverte.
+					Fichiers sélectionnés : <strong>{attachments.map((file) => file.name).join(', ')}</strong>.
+					Il faudra les ajouter dans la messagerie ouverte si le partage direct n’est pas disponible.
 				</p>
 			{/if}
 
 			<div class="support-actions">
 				<button type="button" class="btn btn-primary" onclick={prepareMail}>Préparer le mail</button>
+				<button
+					type="button"
+					class="btn btn-secondary"
+					onclick={shareWithAttachments}
+					disabled={!attachments.length}
+				>
+					Partager avec fichiers
+				</button>
 				<button type="button" class="btn btn-secondary" onclick={copyMessage}>Copier le message</button>
 			</div>
 

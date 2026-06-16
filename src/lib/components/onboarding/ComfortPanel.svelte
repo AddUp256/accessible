@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de parcours d?accueil : encapsule l?affichage et les interactions r?utilisables.
+
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import { bilingualLabel, resolveWebSpeechLocale, type UiKey } from '$lib/i18n';
 	import { tts } from '$lib/services/tts';

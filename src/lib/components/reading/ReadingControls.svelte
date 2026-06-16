@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de lecture adapt?e : encapsule l?affichage et les interactions r?utilisables.
+
 	import { onMount } from 'svelte';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';

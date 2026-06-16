@@ -1,3 +1,4 @@
+/** R?le : Service de stockage local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { invoke } from '@tauri-apps/api/core';
 
 export function isTauriRuntime(): boolean {

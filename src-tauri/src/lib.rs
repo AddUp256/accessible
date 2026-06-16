@@ -1,3 +1,4 @@
+//! R?le : Noyau Tauri : migrations SQLite, stockage profil et enregistrement des commandes natives.
 use std::fs;
 use std::path::PathBuf;
 use tauri::Manager;
@@ -5,6 +6,7 @@ use tauri_plugin_sql::{Migration, MigrationKind};
 
 mod dictation;
 mod espeak;
+mod fonts;
 mod grammar;
 mod lang_packs;
 mod ocr;
@@ -262,8 +264,10 @@ fn get_sqlite_db_path(app: tauri::AppHandle) -> Result<String, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 #[tauri::command]
-fn quit_application(app: tauri::AppHandle) {
+fn quit_application(app: tauri::AppHandle, window: tauri::Window) -> Result<(), String> {
+    window.close().map_err(|e| e.to_string())?;
     app.exit(0);
+    Ok(())
 }
 
 pub fn run() {
@@ -300,6 +304,9 @@ pub fn run() {
             get_sqlite_db_uri,
             espeak::get_espeak_status,
             espeak::espeak_synthesize,
+            fonts::get_custom_fonts_directory,
+            fonts::open_custom_fonts_directory,
+            fonts::list_installed_fonts,
             ocr::is_tesseract_available,
             ocr::is_tesseract_language_available,
             ocr::ocr_extract_text,

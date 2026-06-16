@@ -1,3 +1,4 @@
+//! R?le : Module Rust Dictation : commandes natives et pont syst?me pour Accessible.
 use serde::Serialize;
 
 #[cfg(windows)]

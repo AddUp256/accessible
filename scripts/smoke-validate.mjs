@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/** R?le : Script de maintenance Smoke Validate pour automatiser les t?ches du d?p?t. */
 /**
  * Smoke validation after `npm run check` and `npm run build`.
  * Verifies build artifacts and critical project files.

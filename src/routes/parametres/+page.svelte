@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/parametres : assemble l?interface utilisateur et les actions de cette zone.
+
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { settings, profileStore } from '$lib/stores/profile';
@@ -22,6 +24,8 @@
 	import { PROFILE_VERSION } from '$lib/types/profile';
 	import { initProfileStorage } from '$lib/services/storage/local';
 	import { createDefaultProfile } from '$lib/services/storage/default-profile';
+	import { FUNCTIONAL_NEEDS_BY_ID } from '$lib/config/functional-needs';
+	import { TOOLS_BY_ID } from '$lib/config/tools-catalog';
 	import {
 		fetchModuleStorageStats,
 		getStorageBackend,
@@ -35,7 +39,7 @@
 		tauriGetSqliteDbPath,
 		tauriGetStoragePath
 	} from '$lib/services/storage/tauri';
-	import type { UISettings } from '$lib/types/profile';
+	import type { FunctionalNeedId, UISettings } from '$lib/types/profile';
 	import { isExpertDetail } from '$lib/utils/detail-level';
 
 	const themes: { value: UISettings['theme']; fr: string; key: UiKey }[] = [
@@ -142,6 +146,101 @@
 	function exportDocx() {
 		downloadProfileDocx(get(profileStore));
 		setStatus('dyn.settings.exportDocx');
+	}
+
+	function detectedOperatingSystem(): string {
+		if (typeof navigator === 'undefined') return 'Système non détecté';
+		const platform = navigator.userAgent || navigator.platform || '';
+		if (/Windows/i.test(platform)) return 'Windows 10/11';
+		if (/Macintosh|Mac OS|MacIntel/i.test(platform)) return 'macOS';
+		if (/Linux/i.test(platform)) return 'Linux';
+		return 'Système non détecté';
+	}
+
+	function exportOfficeClickGuide() {
+		const profile = get(profileStore);
+		const activeTools = profile.activatedTools.map((id) => TOOLS_BY_ID[id]?.label ?? id);
+		const needs = Object.values(profile.functionalProfiles)
+			.flat()
+			.map((entry) => {
+				const id = entry.id as FunctionalNeedId;
+				return FUNCTIONAL_NEEDS_BY_ID[id]?.label ?? id;
+			});
+		const os = detectedOperatingSystem();
+		const hasTool = (ids: string[]) => ids.some((id) => profile.activatedTools.some((tool) => tool === id));
+		const lines = [
+			'# Accessible - guide clic par clic bureautique',
+			'',
+			`Date : ${new Date().toLocaleDateString('fr-FR')}`,
+			`Système détecté : ${os}`,
+			'',
+			'## Besoins et outils retenus',
+			...(needs.length ? needs.map((item) => `- ${item}`) : ['- Aucun besoin fonctionnel enregistré.']),
+			'',
+			'## Outils Accessible activés',
+			...(activeTools.length ? activeTools.map((item) => `- ${item}`) : ['- Aucun outil activé.']),
+			'',
+			'## Réglages de base à reproduire',
+			`- Police de lecture : ${profile.settings.reading.font}`,
+			`- Taille du texte : ${profile.settings.reading.fontSize}px`,
+			`- Interligne : ${profile.settings.reading.lineHeight}`,
+			`- Fond conseillé : ${profile.settings.reading.background}`,
+			`- Thème interface : ${profile.settings.ui.theme}`,
+			'',
+			'## Windows 10/11',
+			'1. Ouvrir Paramètres Windows > Accessibilité.',
+			'2. Régler Taille du texte et Contraste selon le confort testé dans Accessible.',
+			'3. Ouvrir Paramètres Windows > Heure et langue > Voix pour vérifier les voix installées.',
+			'4. Épingler Accessible, Word/LibreOffice, le navigateur et le dossier de travail dans la barre des tâches.',
+			'',
+			'## Microsoft Word',
+			'1. Ouvrir Word > Accueil > Police et choisir la police la plus confortable.',
+			'2. Dans Accueil > Paragraphe, régler l’interligne et l’espacement après paragraphe.',
+			'3. Dans Affichage, tester Mode lecture, Immersive Reader ou Focus si disponibles.',
+			'4. Enregistrer le document comme modèle si les réglages doivent être réutilisés.',
+			'',
+			'## LibreOffice Writer',
+			'1. Ouvrir Format > Page pour régler les marges et le fond si nécessaire.',
+			'2. Ouvrir Styles, modifier le style Corps de texte avec la police, la taille et l’interligne retenus.',
+			'3. Ouvrir Outils > Orthographe pour vérifier les dictionnaires français.',
+			'4. Enregistrer comme modèle via Fichier > Modèles > Enregistrer comme modèle.',
+			'',
+			'## Navigateur Edge ou Chrome',
+			'1. Ouvrir Paramètres > Apparence et régler zoom, taille des polices et thème.',
+			'2. Ajouter Accessible en favori et autoriser l’audio si la lecture vocale est utilisée.',
+			'3. Pour les PDF, tester ouvrir dans le navigateur puis copier le texte vers Accessible si le PDF est sélectionnable.',
+			'',
+			'## Outlook, Teams ou messagerie',
+			'1. Préparer une signature courte expliquant les aménagements utiles si besoin.',
+			'2. Épingler les modèles de réponses ou messages fréquents.',
+			'3. Pour une réunion, demander support écrit, ordre du jour et compte rendu si ces besoins sont cochés.',
+			'',
+			'## Actions selon les tests Accessible',
+			hasTool(['read_adapted', 'listen_text'])
+				? '- Lecture : appliquer police, taille, interligne, fond doux et lecture audio dans les logiciels utilisés.'
+				: '- Lecture : aucun réglage spécifique activé pour l’instant.',
+			hasTool(['write_easier', 'correct_text', 'reduce_typing'])
+				? '- Écriture : activer correction pas à pas, modèles de phrases, dictée ou prédiction quand disponible.'
+				: '- Écriture : aucun réglage spécifique activé pour l’instant.',
+			hasTool(['organize_work'])
+				? '- Organisation : créer une checklist type, un minuteur de travail et un dossier unique pour chaque tâche.'
+				: '- Organisation : aucun réglage spécifique activé pour l’instant.',
+			hasTool(['pictograms', 'prepare_appointment'])
+				? '- Communication : préparer des messages courts, pictogrammes ou phrases à montrer avant les situations difficiles.'
+				: '- Communication : aucun réglage spécifique activé pour l’instant.',
+			hasTool(['subtitles'])
+				? '- Audio/vidéo : demander sous-titres, transcription ou support écrit avant visionnage.'
+				: '- Audio/vidéo : aucun réglage spécifique activé pour l’instant.',
+			'',
+			'Ce guide ne constitue pas un diagnostic. Il sert à reproduire des préférences et aménagements testés.'
+		];
+
+		downloadTextFile(
+			lines.join('\n'),
+			exportFilename('guide-clic-par-clic-bureautique', 'md'),
+			'text/markdown;charset=utf-8'
+		);
+		saveMessage = 'Guide clic par clic bureautique téléchargé.';
 	}
 
 	function downloadExampleProfileJson() {
@@ -296,6 +395,9 @@
 		</button>
 		<button type="button" class="btn btn-secondary" onclick={exportDocx}>
 			<BiText fr="Télécharger DOCX" key="panel.export.downloadDocx" inline />
+		</button>
+		<button type="button" class="btn btn-secondary" onclick={exportOfficeClickGuide}>
+			Télécharger le guide clic par clic bureautique
 		</button>
 	</div>
 

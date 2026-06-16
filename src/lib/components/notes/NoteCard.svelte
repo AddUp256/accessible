@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de notes : encapsule l?affichage et les interactions r?utilisables.
+
 	import ReadAloudButton from '$lib/components/ui/ReadAloudButton.svelte';
 	import { noteToMarkdown, sanitizeFilename } from '$lib/modules/notes/note';
 	import { downloadNoteDocx, downloadNoteOdt } from '$lib/services/export';
