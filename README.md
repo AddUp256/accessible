@@ -39,7 +39,17 @@ Le projet peut être étudié comme prototype d'outil d'accessibilité numériqu
 - conditions de support, maintenance, sécurité et responsabilité ;
 - conformité RGPD et doctrine de conservation des données locales ;
 - politique de distribution, signature des installateurs, validation antivirus et homologation poste de travail ;
-- séparation entre code open source, contenus éditoriaux et usages commerciaux interdits sans autorisation.
+- licence open source, gouvernance éditoriale, modalités de contribution et périmètre de maintenance.
+
+## Pourquoi ce projet existe
+
+Accessible est publié en pré-version pour répondre à un besoin concret : disposer d'un outil gratuit, libre et adaptable pour aider des élèves, étudiants, enseignants, accompagnants et personnes concernées à tester rapidement des aménagements numériques.
+
+Le projet s'adresse notamment aux situations où l'environnement de travail doit être plus clair, plus stable ou plus personnalisable : troubles DYS, TDAH, TSA, fatigue cognitive, difficultés de concentration, besoins linguistiques, surcharge sensorielle, accompagnement pédagogique ou simple recherche de confort d'usage.
+
+Accessible ne remplace pas une évaluation professionnelle et ne pose pas de diagnostic. Il aide à choisir des fonctionnalités utiles, à faciliter la lecture de documents, à organiser le travail et à produire une synthèse partageable si l'utilisateur le souhaite.
+
+Le projet est codé avec l'aide de l'intelligence artificielle. Ce choix est assumé comme une première réponse pragmatique, en l'absence de solution gratuite, libre et suffisamment complète pour certains besoins urgents. Les retours sont donc précieux : bugs, idées, besoins réels, compatibilité, accessibilité, documentation, architecture et qualité du code. Les contributions de développeurs, designers, enseignants, ingénieurs pédagogiques, accompagnants et personnes concernées sont bienvenues.
 
 ## Ce que fait Accessible
 
@@ -127,15 +137,13 @@ Points d'attention pour une université :
 
 Voir aussi [PRIVACY.md](./PRIVACY.md), [SECURITY.md](./SECURITY.md) et [SUPPORT.md](./SUPPORT.md).
 
-## Cadre juridique et usage commercial
+## Licence et contributions
 
-Le code logiciel est publié sous licence MIT lorsque cette licence s'applique explicitement au code source.
+Accessible est publié sous licence MIT. Cette licence autorise l'utilisation, la copie, la modification, la distribution et l'intégration du code, y compris dans d'autres projets, à condition de conserver la notice de licence et les mentions de copyright prévues par le fichier [LICENSE](./LICENSE).
 
-Sauf autorisation écrite, préalable, expresse et spécifique d'Atelier Eden, toute reproduction, adaptation, diffusion, intégration, extraction, revente, mise à disposition ou exploitation du contenu éditorial, pédagogique, graphique, documentaire ou méthodologique d'Accessible à des fins commerciales, directes ou indirectes, est interdite.
+Cette ouverture ne signifie pas que le projet est un produit fini ou supporté comme une solution commerciale. Il s'agit d'une pré-version : toute réutilisation, expérimentation ou adaptation doit tenir compte des limites indiquées dans la documentation, du caractère non diagnostique de l'outil et des vérifications nécessaires en contexte institutionnel.
 
-Toute utilisation non autorisée pourra donner lieu à une demande de retrait, de réparation du préjudice subi et, le cas échéant, à des poursuites judiciaires.
-
-Contact éditeur : Atelier Eden, contact@atelier-eden.pro. Adresse postale et représentant légal à compléter avant publication juridique.
+Les contributions sont bienvenues, en particulier sur la qualité du code, l'accessibilité réelle, les tests, les traductions, la documentation, les installateurs, la sécurité, l'expérience utilisateur et l'adaptation aux environnements bureautiques courants.
 
 ## Démarrage développeur
 
