@@ -1,3 +1,4 @@
+/** R?le : Service de reconnaissance de texte : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { invoke } from '@tauri-apps/api/core';
 
 export async function tauriIsTesseractAvailable(): Promise<boolean> {

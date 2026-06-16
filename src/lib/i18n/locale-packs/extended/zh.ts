@@ -1,3 +1,4 @@
+/** R?le : Pack i18n typ? Zh : traductions explicites pour l?interface bilingue. */
 import type { ExtendedUiKey } from '../../ui-extended';
 
 export const EXTENDED_ZH: Partial<Record<ExtendedUiKey, string>> = {

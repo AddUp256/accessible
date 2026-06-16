@@ -1,6 +1,7 @@
+/** R?le : Pack i18n typ? Tr : traductions explicites pour l?interface bilingue. */
 import type { PanelUiKey } from '../../ui-panels';
 
-/** Panel strings (Turkish). */
+/** Textes de panneaux (turc). */
 export const PANEL_TR: Partial<Record<PanelUiKey, string>> = {
 	'panel.appMode.title': 'Kullanım modu',
 	'panel.appMode.hint':

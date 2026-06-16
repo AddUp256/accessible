@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Ui Hi Pack : s?lection, repli et chargement des textes bilingues. */
 import type { UiKey } from './ui-translations';
 
 /** हिंदी अनुवाद (द्विभाषी इंटरफ़ेस — अंग्रेज़ी पर वापस नहीं). UI_DE_PACK का दर्पण। */

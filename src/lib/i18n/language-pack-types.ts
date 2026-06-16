@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Language Pack Types : s?lection, repli et chargement des textes bilingues. */
 /** Fichier pack de langue installé localement (`lang-packs/{code}.json`). */
 export interface LanguagePackManifest {
 	code: string;

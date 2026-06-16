@@ -1,3 +1,4 @@
+/** R?le : Service de service applicatif : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { get } from 'svelte/store';
 import { invoke } from '@tauri-apps/api/core';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -7,7 +8,7 @@ import { saveProfileAsync } from '$lib/services/storage/local';
 import { isTauriRuntime } from '$lib/services/storage/tauri';
 
 let quitting = false;
-const QUIT_FLUSH_TIMEOUT_MS = 1800;
+const QUIT_FLUSH_TIMEOUT_MS = 5000;
 
 /** Enregistre le profil actif avant fermeture. */
 export async function flushProfileState(profile?: AccessibleProfile): Promise<void> {
@@ -43,7 +44,12 @@ export async function quitApplication(): Promise<void> {
 	try {
 		await flushProfileStateBeforeQuit();
 		if (isTauriRuntime()) {
-			await invoke('quit_application');
+			try {
+				await invoke('quit_application');
+			} catch (error) {
+				await getCurrentWindow().close();
+				throw error;
+			}
 			return;
 		}
 		window.close();
@@ -71,14 +77,25 @@ export async function bindAppLifecycle(): Promise<() => void> {
 		cleanups.push(unlisten);
 	}
 
-	const onBeforeUnload = () => {
+	const flushCurrentProfileSoon = () => {
 		const profile = get(profileStore);
 		if (!profile.privacy.guestMode) {
 			void profileStore.flushPendingSaves();
 		}
 	};
-	window.addEventListener('beforeunload', onBeforeUnload);
-	cleanups.push(() => window.removeEventListener('beforeunload', onBeforeUnload));
+	const onVisibilityChange = () => {
+		if (document.visibilityState === 'hidden') {
+			flushCurrentProfileSoon();
+		}
+	};
+	window.addEventListener('beforeunload', flushCurrentProfileSoon);
+	window.addEventListener('pagehide', flushCurrentProfileSoon);
+	document.addEventListener('visibilitychange', onVisibilityChange);
+	cleanups.push(() => {
+		window.removeEventListener('beforeunload', flushCurrentProfileSoon);
+		window.removeEventListener('pagehide', flushCurrentProfileSoon);
+		document.removeEventListener('visibilitychange', onVisibilityChange);
+	});
 
 	return () => {
 		for (const fn of cleanups) fn();

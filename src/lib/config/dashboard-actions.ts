@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Dashboard Actions : donn?es m?tier sans effet de bord. */
 /** Actions rapides du tableau de bord. */
 export interface DashboardAction {
 	id: string;

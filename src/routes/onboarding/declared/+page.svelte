@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/onboarding/declared : assemble l?interface utilisateur et les actions de cette zone.
+
 	import StepProgress from '$lib/components/ui/StepProgress.svelte';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import { MEDICAL_PROFILES, MEDICAL_PROFILE_DISCLAIMER } from '$lib/config/medical-profiles';
@@ -24,8 +26,8 @@
 
 	function skipUnknown() {
 		selected = [];
-		saveDeclaredPath([]);
-		goto('/onboarding/comfort');
+		setOnboardingPath('discovery');
+		goto('/onboarding/discovery');
 	}
 
 	function continuePath() {

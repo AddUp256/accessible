@@ -1,3 +1,4 @@
+/** R?le : Service de transcription m?dia : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 export interface TranscriptSegment {
 	startMs: number;
 	endMs: number;

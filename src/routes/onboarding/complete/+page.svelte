@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/onboarding/complete : assemble l?interface utilisateur et les actions de cette zone.
+
 	import { onMount } from 'svelte';
 	import { profileStore } from '$lib/stores/profile';
 	import { MEDICAL_PROFILES_BY_ID } from '$lib/config/medical-profiles';

@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Medical Profiles : donn?es m?tier sans effet de bord. */
 import type { MedicalProfileMeta } from '$lib/types/profile';
 
 /** Profils médicaux / administratifs déclarés — sélection libre, jamais interprétés comme diagnostic. */

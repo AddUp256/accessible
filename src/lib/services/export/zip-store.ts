@@ -1,7 +1,8 @@
+/** R?le : Service de export local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 export interface ZipEntry {
 	path: string;
 	data: Uint8Array;
-	/** ODT mimetype must be stored uncompressed at the start of the archive. */
+	/** Le mimetype ODT doit rester non compress? au d?but de l?archive. */
 	uncompressed?: boolean;
 }
 

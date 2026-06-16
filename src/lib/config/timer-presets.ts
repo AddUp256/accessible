@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Timer Presets : donn?es m?tier sans effet de bord. */
 /** Durées prédéfinies — minuteur local, sans notification système. */
 
 export type TimerKind = 'pause' | 'focus' | 'custom';

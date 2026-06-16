@@ -1,3 +1,4 @@
+/** R?le : Service de correction orthographique et grammaticale : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { browser } from '$app/environment';
 
 import { isTauriRuntime } from '$lib/services/storage/tauri';

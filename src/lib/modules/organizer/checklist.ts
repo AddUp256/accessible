@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de organisation : fonctions pures ou r?gles locales testables hors interface. */
 import type { Checklist, ChecklistItem, OrganizerData } from '$lib/types/profile';
 
 export function createId(prefix: string): string {

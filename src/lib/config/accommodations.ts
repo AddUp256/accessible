@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Accommodations : donn?es m?tier sans effet de bord. */
 import type { AccommodationSuggestion, FunctionalNeedId } from '$lib/types/profile';
 
 /** Aménagements à discuter — formulations neutres, jamais prescriptives. */

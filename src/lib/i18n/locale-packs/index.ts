@@ -1,3 +1,4 @@
+/** R?le : Pack i18n typ? Index : traductions explicites pour l?interface bilingue. */
 import type { UiKey } from '../ui-translations';
 import { PRIORITY_LANGUAGE_CODES } from '../priority-languages';
 import { UI_AR_PACK } from '../ui-ar-pack';

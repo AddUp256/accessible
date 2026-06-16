@@ -1,3 +1,4 @@
+/** R?le : Extension Demo Word Count : registre ou exemple de plugin int?gr?. */
 import type { AccessiblePlugin } from '../registry';
 
 /** Exemple d’extension — ajoute une action tableau de bord vers l’écriture. */

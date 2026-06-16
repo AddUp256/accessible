@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de ?criture assist?e : fonctions pures ou r?gles locales testables hors interface. */
 /** Repère les phrases longues — aide locale, pas une correction orthographique. */
 
 export interface LongSentenceHint {

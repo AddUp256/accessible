@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Language Pack Runtime : s?lection, repli et chargement des textes bilingues. */
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 
@@ -10,7 +11,7 @@ import {
 import type { DynamicKey } from './ui-dynamic';
 import { DYNAMIC_LOCALE_PACKS } from './ui-dynamic-locales';
 import type { LanguagePackPayload } from './language-pack-types';
-import { isPriorityLanguage, PRIORITY_LANGUAGE_CODES } from './priority-languages';
+import { PRIORITY_LANGUAGE_CODES } from './priority-languages';
 import type { UiKey } from './ui-translations';
 
 /** Langues dont le pack est présent sur le disque (hors fr). */
@@ -147,7 +148,6 @@ export async function ensureSecondaryLanguagePack(
 	bilingualUi: boolean
 ): Promise<void> {
 	if (!bilingualUi || code === 'fr' || code === 'en') return;
-	if (!isPriorityLanguage(code)) return;
 	await loadLanguagePack(code);
 }
 

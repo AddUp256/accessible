@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de compr?hension des consignes : fonctions pures ou r?gles locales testables hors interface. */
 export type InstructionStepKind = 'numbered' | 'bullet' | 'sentence' | 'line';
 
 export interface InstructionStep {

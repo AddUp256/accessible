@@ -1,3 +1,4 @@
+/** R?le : Pack i18n typ? Bilingual Priority : traductions explicites pour l?interface bilingue. */
 import type { PanelUiKey } from '../../ui-panels';
 import type { ModuleLocaleCode } from '../modules';
 

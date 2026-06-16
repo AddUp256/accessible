@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative App Modes : donn?es m?tier sans effet de bord. */
 import type { AppMode, AccessibleProfile } from '$lib/types/profile';
 
 export interface AppModeInfo {

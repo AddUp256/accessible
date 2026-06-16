@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de profil et personnalisation : encapsule l?affichage et les interactions r?utilisables.
+
 	import { page } from '$app/stores';
 	import FeatureGuard from '$lib/components/profile/FeatureGuard.svelte';
 	import {

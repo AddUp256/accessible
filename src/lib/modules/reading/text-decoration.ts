@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de lecture adapt?e : fonctions pures ou r?gles locales testables hors interface. */
 import type { ReadingSettings } from '$lib/types/profile';
 import { syllabifyFrenchText } from '$lib/modules/reading/syllabify-fr';
 import { markSilentLetters } from '$lib/modules/reading/silent-letters-fr';

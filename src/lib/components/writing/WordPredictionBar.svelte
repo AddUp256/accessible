@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de ?criture assist?e : encapsule l?affichage et les interactions r?utilisables.
+
 	import { predictWords, applySuggestion } from '$lib/modules/writing/word-prediction';
 
 	let {

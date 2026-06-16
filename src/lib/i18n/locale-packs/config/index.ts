@@ -1,3 +1,4 @@
+/** R?le : Pack i18n typ? Index : traductions explicites pour l?interface bilingue. */
 import type { ConfigKey } from '../../ui-config';
 import { CONFIG_AR } from './ar';
 import { CONFIG_DE } from './de';

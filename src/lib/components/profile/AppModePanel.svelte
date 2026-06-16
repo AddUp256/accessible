@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de profil et personnalisation : encapsule l?affichage et les interactions r?utilisables.
+
 	import { APP_MODES, applyAppMode } from '$lib/config/app-modes';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';

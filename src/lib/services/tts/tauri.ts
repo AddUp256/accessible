@@ -1,3 +1,4 @@
+/** R?le : Service de lecture vocale : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { invoke } from '@tauri-apps/api/core';
 
 export interface PiperStatus {

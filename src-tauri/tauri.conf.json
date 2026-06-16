@@ -5,7 +5,7 @@
   "identifier": "fr.accessible.desktop",
   "build": {
     "frontendDist": "../build",
-    "devUrl": "http://localhost:5173",
+    "devUrl": "http://127.0.0.1:5173",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build"
   },
@@ -24,7 +24,13 @@
     "security": {
       "csp": {
         "default-src": ["'self'", "ipc:", "http://ipc.localhost"],
-        "connect-src": ["'self'", "ipc:", "http://ipc.localhost", "https://api.arasaac.org"],
+        "connect-src": [
+          "'self'",
+          "ipc:",
+          "http://ipc.localhost",
+          "https://api.arasaac.org",
+          "https://api.github.com"
+        ],
         "img-src": [
           "'self'",
           "data:",

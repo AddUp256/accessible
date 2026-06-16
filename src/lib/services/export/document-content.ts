@@ -1,3 +1,4 @@
+/** R?le : Service de export local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { escapeXml } from './xml-escape';
 
 export interface DocumentBlock {

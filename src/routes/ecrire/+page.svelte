@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page SvelteKit /routes/ecrire : assemble l?interface utilisateur et les actions de cette zone.
+
 
 	import CorrecteurPanel from '$lib/components/writing/CorrecteurPanel.svelte';
 	import OnboardingTestReturn from '$lib/components/onboarding/OnboardingTestReturn.svelte';

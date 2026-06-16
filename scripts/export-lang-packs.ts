@@ -1,6 +1,7 @@
+/** R?le : Script de maintenance Export Lang Packs pour automatiser les t?ches du d?p?t. */
 /**
  * Génère les packs JSON pour l'installateur et l'application Tauri.
- * Usage: npx tsx scripts/export-lang-packs.ts
+ * Utilisation: npx tsx scripts/export-lang-packs.ts
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

@@ -1,3 +1,4 @@
+/** R?le : Service de reconnaissance de texte : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { browser } from '$app/environment';
 import { get } from 'svelte/store';
 

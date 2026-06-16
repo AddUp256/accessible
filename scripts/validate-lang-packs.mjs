@@ -1,7 +1,8 @@
 #!/usr/bin/env node
+/** R?le : Script de maintenance Validate Lang Packs pour automatiser les t?ches du d?p?t. */
 /**
  * Valide les packs JSON (installateur + static + ressources Tauri).
- * Usage: npm run validate:lang-packs
+ * Utilisation: npm run validate:lang-packs
  */
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';

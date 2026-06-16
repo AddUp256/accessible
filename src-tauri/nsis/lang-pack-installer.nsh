@@ -1,3 +1,4 @@
+; R?le : Script NSIS Lang Pack Installer : logique installateur Windows et packs de langue.
 ; Accessible — mode d'installation et sélection des packs de langue (interface bilingue)
 
 LangString accessibleLangModeTitle ${LANG_FRENCH} "Comment souhaitez-vous installer Accessible ?"
@@ -18,7 +19,17 @@ LangString accessibleLangSelectTitle ${LANG_ENGLISH} "Select languages to instal
 LangString accessibleLangSelectNone ${LANG_FRENCH} "Sélectionnez au moins une langue."
 LangString accessibleLangSelectNone ${LANG_ENGLISH} "Select at least one language."
 
+LangString accessibleShortcutTitle ${LANG_FRENCH} "Raccourci de bureau"
+LangString accessibleShortcutTitle ${LANG_ENGLISH} "Desktop shortcut"
+
+LangString accessibleShortcutHint ${LANG_FRENCH} "Accessible peut ajouter un bouton de lancement sur le Bureau."
+LangString accessibleShortcutHint ${LANG_ENGLISH} "Accessible can add a launch button on the desktop."
+
+LangString accessibleShortcutCreate ${LANG_FRENCH} "Créer un raccourci Accessible sur le Bureau"
+LangString accessibleShortcutCreate ${LANG_ENGLISH} "Create an Accessible shortcut on the desktop"
+
 Var AccessibleLangMode     ; 0 = installation complète, 1 = packs de langue uniquement
+Var AccessibleDesktopShortcutSel
 Var AccessibleLangSelES
 Var AccessibleLangSelAR
 Var AccessibleLangSelZH
@@ -52,6 +63,7 @@ Var LangChkDE
 Var LangChkHI
 Var LangChkUK
 Var LangChkTR
+Var DesktopShortcutChk
 
 !macro AccessibleRecordHad LANGCODE HADVAR
   StrCpy ${HADVAR} 0
@@ -73,6 +85,10 @@ Var LangChkTR
 !macroend
 
 !macro NSIS_HOOK_POSTINSTALL
+  ${If} $AccessibleLangMode = 0
+  ${AndIf} $AccessibleDesktopShortcutSel = ${BST_CHECKED}
+    Call CreateOrUpdateDesktopShortcut
+  ${EndIf}
   !insertmacro AccessibleFinalizeLangPacks
 !macroend
 
@@ -223,6 +239,29 @@ Function AccessibleLangSelectLeave
     MessageBox MB_ICONEXCLAMATION "$(accessibleLangSelectNone)"
     Abort
   ${EndIf}
+FunctionEnd
+
+; --- Page 3 : raccourci de bureau ---
+Function AccessibleDesktopShortcutPage
+  Call AccessibleSkipIfPassiveOrLangOnly
+  StrCpy $AccessibleDesktopShortcutSel ${BST_CHECKED}
+  nsDialogs::Create 1018
+  Pop $0
+  ${IfThen} $(^RTL) = 1 ${|} nsDialogs::SetRTL $(^RTL) ${|}
+
+  ${NSD_CreateLabel} 0 0 100% 18u "$(accessibleShortcutTitle)"
+  Pop $1
+  ${NSD_CreateLabel} 0 26u 100% 24u "$(accessibleShortcutHint)"
+  Pop $2
+  ${NSD_CreateCheckbox} 10u 60u 100% 12u "$(accessibleShortcutCreate)"
+  Pop $DesktopShortcutChk
+  SendMessage $DesktopShortcutChk ${BM_SETCHECK} ${BST_CHECKED} 0
+
+  nsDialogs::Show
+FunctionEnd
+
+Function AccessibleDesktopShortcutLeave
+  ${NSD_GetState} $DesktopShortcutChk $AccessibleDesktopShortcutSel
 FunctionEnd
 
 !macro AccessibleFinalizeLangPacks

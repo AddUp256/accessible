@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Dashboard I18n : s?lection, repli et chargement des textes bilingues. */
 import type { DashboardAction } from '$lib/config/dashboard-actions';
 import type { UISettings } from '$lib/types/profile';
 

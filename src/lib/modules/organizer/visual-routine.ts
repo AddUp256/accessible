@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de organisation : fonctions pures ou r?gles locales testables hors interface. */
 import type { OrganizerData, VisualRoutine, VisualRoutineStep } from '$lib/types/profile';
 import { createId } from '$lib/modules/organizer/checklist';
 

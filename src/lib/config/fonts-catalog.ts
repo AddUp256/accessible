@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Fonts Catalog : donn?es m?tier sans effet de bord. */
 import type { FontId, FontMeta } from '$lib/types/profile';
 
 function font(

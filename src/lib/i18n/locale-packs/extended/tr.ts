@@ -1,6 +1,7 @@
+/** R?le : Pack i18n typ? Tr : traductions explicites pour l?interface bilingue. */
 import type { ExtendedUiKey } from '../../ui-extended';
 
-/** Extended UI strings (Turkish). */
+/** Textes UI ?tendus (turc). */
 export const EXTENDED_TR: Partial<Record<ExtendedUiKey, string>> = {
 	'home.welcome.line1': 'Accessible tanı koymaz.',
 	'home.welcome.line2': 'Accessible ihtiyaçlarınızı tanımanıza yardımcı olur.',

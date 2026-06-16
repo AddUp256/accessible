@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de m?morisation : fonctions pures ou r?gles locales testables hors interface. */
 import type { Flashcard, FlashcardDeck, FlashcardSchedule, MemorizationData } from '$lib/types/profile';
 import { createId } from '$lib/modules/organizer/checklist';
 

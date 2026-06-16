@@ -1,3 +1,4 @@
+/** R?le : Service de stockage local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { browser } from '$app/environment';
 import type { AccessibleProfile } from '$lib/types/profile';
 import { STORAGE_KEY } from './constants';

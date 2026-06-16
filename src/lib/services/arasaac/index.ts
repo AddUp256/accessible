@@ -1,3 +1,4 @@
+/** R?le : Service de pictogrammes ARASAAC : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import {
 	ARASAAC_API_BASE,
 	ARASAAC_LOCALE,

@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Index : s?lection, repli et chargement des textes bilingues. */
 import { CARD_TRANSLATIONS } from './card-translations';
 import { bilingualLabel, bilingualPair, bilingualUi, getUiTranslation } from './bilingual';
 

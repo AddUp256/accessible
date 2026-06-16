@@ -1,3 +1,4 @@
+; R?le : Script NSIS Installer : logique installateur Windows et packs de langue.
 Unicode true
 ManifestDPIAware true
 ; Add in `dpiAwareness` `PerMonitorV2` to manifest for Windows 10 1607+ (note this should not affect lower versions since they should be able to ignore this and pick up `dpiAware` `true` set by `ManifestDPIAware true`)
@@ -172,6 +173,7 @@ VIAddVersionKey "ProductVersion" "${VERSION}"
 ; 1b. Accessible — mode d'installation et langues
 Page custom AccessibleLangModePage AccessibleLangModeLeave
 Page custom AccessibleLangSelectPage AccessibleLangSelectLeave
+Page custom AccessibleDesktopShortcutPage AccessibleDesktopShortcutLeave
 
 ; 2. License Page (if defined)
 !if "${LICENSE}" != ""
@@ -410,10 +412,6 @@ Var AppStartMenuFolder
 ; Don't auto jump to finish page after installation page,
 ; because the installation page has useful info that can be used debug any issues with the installer.
 !define MUI_FINISHPAGE_NOAUTOCLOSE
-; Use show readme button in the finish page as a button create a desktop shortcut
-!define MUI_FINISHPAGE_SHOWREADME
-!define MUI_FINISHPAGE_SHOWREADME_TEXT "$(createDesktop)"
-!define MUI_FINISHPAGE_SHOWREADME_FUNCTION CreateOrUpdateDesktopShortcut
 ; Show run app after installation.
 !define MUI_FINISHPAGE_RUN
 !define MUI_FINISHPAGE_RUN_FUNCTION RunMainBinary

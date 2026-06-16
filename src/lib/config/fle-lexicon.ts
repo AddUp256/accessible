@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Fle Lexicon : donn?es m?tier sans effet de bord. */
 /** Lexique FLE de base — termes courants en contexte scolaire/administratif. */
 export interface FleLexiconEntry {
 	term: string;

@@ -1,3 +1,4 @@
+/** R?le : Configuration SvelteKit statique, avec base GitHub Pages et mode runes. */
 import adapter from '@sveltejs/adapter-static';
 
 const githubPagesBase = process.env.GITHUB_PAGES === 'true' ? '/accessible' : '';
@@ -5,7 +6,7 @@ const githubPagesBase = process.env.GITHUB_PAGES === 'true' ? '/accessible' : ''
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	compilerOptions: {
-		// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
+		// Force le mode runes sur le projet, sauf pour les biblioth?ques. ? retirer lorsque Svelte 6 le rendra inutile.
 		runes: ({ filename }) => filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 	},
 	kit: {

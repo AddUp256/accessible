@@ -1,3 +1,4 @@
+/** R?le : Service de service applicatif : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { get, writable } from 'svelte/store';
 import { settings } from '$lib/stores/profile';
 

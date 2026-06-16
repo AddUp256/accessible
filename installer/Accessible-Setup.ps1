@@ -1,3 +1,4 @@
+# R?le : Installateur PowerShell local pour d?ployer Accessible et ses packs de langue.
 #Requires -Version 5.1
 <#
 .SYNOPSIS

@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de organisation : fonctions pures ou r?gles locales testables hors interface. */
 export function formatTimer(totalSeconds: number): string {
 	const safe = Math.max(0, totalSeconds);
 	const minutes = Math.floor(safe / 60);

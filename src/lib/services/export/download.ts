@@ -1,3 +1,4 @@
+/** R?le : Service de export local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 /** Téléchargement côté navigateur — aucun serveur distant. */
 export function downloadTextFile(content: string, filename: string, mimeType = 'application/json;charset=utf-8') {
 	const blob = new Blob([content], { type: mimeType });

@@ -1,3 +1,4 @@
+/** R?le : Service de reconnaissance de texte : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 export type OcrSourceKind = 'image' | 'pdf';
 
 export interface OcrSuccess {

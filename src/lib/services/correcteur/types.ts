@@ -1,3 +1,4 @@
+/** R?le : Service de correction orthographique et grammaticale : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 export type SpellcheckMode = 'off' | 'global' | 'step_by_step';
 
 export interface SpellingIssue {

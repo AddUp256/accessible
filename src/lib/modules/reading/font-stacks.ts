@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de lecture adapt?e : fonctions pures ou r?gles locales testables hors interface. */
 import type { FontId, GlossaryEntry, ReadingSettings } from '$lib/types/profile';
 import { simplifyWithFalcEngine } from '$lib/modules/comprehension/falc-engine';
 import { customFontFamily } from '$lib/modules/reading/custom-font';

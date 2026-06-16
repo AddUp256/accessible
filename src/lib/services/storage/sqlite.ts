@@ -1,3 +1,4 @@
+/** R?le : Service de stockage local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import type { AccessibleProfile } from '$lib/types/profile';
 
 import { migrateProfile } from './migrate';
@@ -85,7 +86,7 @@ export async function saveProfileToSqlite(
 		 ON CONFLICT(key) DO UPDATE SET value = excluded.value`
 	);
 
-	// Legacy backup row for export compatibility
+	// Ligne de sauvegarde h?rit?e pour compatibilit? export
 	const now = new Date().toISOString();
 	const content = await wrapProfileForStorage(profile);
 	await db.execute(

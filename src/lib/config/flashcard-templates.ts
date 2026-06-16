@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Flashcard Templates : donn?es m?tier sans effet de bord. */
 /** Modèles de decks — vocabulaire, définitions, formules. */
 
 export interface FlashcardTemplate {

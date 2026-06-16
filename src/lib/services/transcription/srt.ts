@@ -1,3 +1,4 @@
+/** R?le : Service de transcription m?dia : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import type { TranscriptSegment } from './types';
 
 function pad(value: number, length: number): string {

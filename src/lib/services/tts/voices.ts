@@ -1,3 +1,4 @@
+/** R?le : Service de lecture vocale : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import { browser } from '$app/environment';
 
 export interface SpeechVoiceOption {

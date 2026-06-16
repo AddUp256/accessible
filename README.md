@@ -4,6 +4,16 @@ Application locale, légère et utilisable hors connexion pour adapter son envir
 
 **Accessible ne pose pas de diagnostic.**
 
+## Utilisation commerciale du contenu
+
+Sauf autorisation écrite, préalable, expresse et spécifique d'Atelier Eden, toute reproduction, adaptation, diffusion, intégration, extraction, revente, mise à disposition ou exploitation du contenu éditorial, pédagogique, graphique, documentaire ou méthodologique d'Accessible à des fins commerciales, directes ou indirectes, est interdite.
+
+Toute utilisation non autorisée pourra donner lieu à une demande de retrait, de réparation du préjudice subi et, le cas échéant, à des poursuites judiciaires.
+
+Contact éditeur : Atelier Eden — contact@atelier-eden.pro. Adresse postale et représentant légal à compléter avant publication juridique.
+
+Le code logiciel reste publié sous licence MIT lorsque cette licence s'applique explicitement au code source.
+
 ## Télécharger et installer
 
 Les versions prêtes à installer seront publiées dans les **GitHub Releases** du projet.

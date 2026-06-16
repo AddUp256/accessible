@@ -1,3 +1,4 @@
+# R?le : Script de maintenance Install Windows Optional Tools pour automatiser les t?ches du d?p?t.
 param(
     [switch]$SkipTesseract,
     [switch]$SkipFFmpeg,

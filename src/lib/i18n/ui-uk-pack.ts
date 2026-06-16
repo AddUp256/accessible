@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Ui Uk Pack : s?lection, repli et chargement des textes bilingues. */
 import type { UiKey } from './ui-translations';
 
 /** Українські переклади (двомовний інтерфейс — без відкату на англійську). Дзеркало UI_DE_PACK. */

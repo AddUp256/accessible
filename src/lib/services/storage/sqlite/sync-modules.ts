@@ -1,3 +1,4 @@
+/** R?le : Service de stockage local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import type Database from '@tauri-apps/plugin-sql';
 
 import type { AccessibleProfile } from '$lib/types/profile';

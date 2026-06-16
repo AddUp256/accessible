@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de parcours d?accueil : encapsule l?affichage et les interactions r?utilisables.
+
 	import { goto } from '$app/navigation';
 	import { profileStore, settings } from '$lib/stores/profile';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';

@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Functional Needs : donn?es m?tier sans effet de bord. */
 import type { FunctionalNeedMeta } from '$lib/types/profile';
 
 /** Besoins fonctionnels — construits par tests, préférences et usage. */

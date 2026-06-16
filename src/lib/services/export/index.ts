@@ -1,3 +1,4 @@
+/** R?le : Service de export local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 export { downloadProfileJson } from './json';
 export { downloadProfilePdf } from './pdf';
 export { buildPDFSynthesis, PDF_DISCLAIMER, PDF_TITLE, profileForExport } from './build-synthesis';

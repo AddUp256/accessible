@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de compr?hension des consignes : fonctions pures ou r?gles locales testables hors interface. */
 import type { GlossaryEntry } from '$lib/types/profile';
 import { FLE_LEXICON, FLE_LEXICON_BY_TERM } from '$lib/config/fle-lexicon';
 import { simplifyToFalcLegacy } from './falc-simplify';

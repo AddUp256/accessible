@@ -1,29 +1,14 @@
-' Lance Accessible (exe compilé si disponible, sinon mode développement Tauri).
+' Role : compatibilite avec les anciens raccourcis.
+' Le vrai bouton est Lancer Accessible.exe ; ce script delegue au meme controle PowerShell.
 Option Explicit
 
-Dim fso, shell, root, exe, candidates, i, npmCmd
+Dim fso, shell, root, script, command
 
 Set fso = CreateObject("Scripting.FileSystemObject")
 Set shell = CreateObject("WScript.Shell")
 root = fso.GetParentFolderName(WScript.ScriptFullName)
+script = fso.BuildPath(root, "scripts\Launch-Accessible.ps1")
 
-candidates = Array( _
-	"src-tauri\target\release\Accessible.exe", _
-	"src-tauri\target\release\app.exe", _
-	"src-tauri\target\release\bundle\nsis\Accessible.exe", _
-	"src-tauri\target\debug\Accessible.exe", _
-	"src-tauri\target\debug\app.exe" _
-)
-
-For i = 0 To UBound(candidates)
-	exe = fso.BuildPath(root, candidates(i))
-	If fso.FileExists(exe) Then
-		shell.CurrentDirectory = root
-		shell.Run """" & exe & """", 1, False
-		WScript.Quit 0
-	End If
-Next
-
-npmCmd = "cmd /c ""cd /d """ & root & """ && npm run tauri:dev"""
+command = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File """ & script & """"
 shell.CurrentDirectory = root
-shell.Run npmCmd, 1, False
+shell.Run command, 0, False

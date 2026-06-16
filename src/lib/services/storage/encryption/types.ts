@@ -1,3 +1,4 @@
+/** R?le : Service de stockage local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 export const ENVELOPE_FORMAT = 'accessible-encrypted-v1' as const;
 export const PBKDF2_ITERATIONS = 310_000;
 

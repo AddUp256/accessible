@@ -1,3 +1,4 @@
+//! R?le : Module Rust Grammar : commandes natives et pont syst?me pour Accessible.
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -39,20 +40,66 @@ struct GrammalecteError {
     message: String,
     #[serde(rename = "sUnderlined", default)]
     underlined: String,
-    #[serde(rename = "nStartX", default)]
+    #[serde(rename = "nStartX", alias = "nStart", default)]
     start_x: usize,
-    #[serde(rename = "nEndX", default)]
+    #[serde(rename = "nEndX", alias = "nEnd", default)]
     end_x: usize,
     #[serde(rename = "aSuggestions", default)]
     suggestions: Vec<String>,
 }
 
+enum GrammalecteCommandMode {
+    LegacyCli,
+    PythonPackage { package_root: PathBuf },
+}
+
 struct GrammalecteCommand {
     program: String,
     prefix_args: Vec<String>,
+    mode: GrammalecteCommandMode,
 }
 
 static WORK_COUNTER: AtomicU64 = AtomicU64::new(0);
+
+const GRAMMALECTE_PROBE_SCRIPT: &str = r#"
+import sys
+from pathlib import Path
+
+package_root = Path(sys.argv[1])
+sys.path.insert(0, str(package_root.parent))
+import grammalecte.grammar_checker as grammar_checker
+grammar_checker.GrammarChecker("fr")
+"#;
+
+const GRAMMALECTE_BRIDGE_SCRIPT: &str = r#"
+import json
+import sys
+from pathlib import Path
+
+package_root = Path(sys.argv[1])
+input_path = Path(sys.argv[2])
+sys.path.insert(0, str(package_root.parent))
+import grammalecte.grammar_checker as grammar_checker
+
+checker = grammar_checker.GrammarChecker("fr")
+text = input_path.read_text(encoding="utf-8")
+data = []
+for index, paragraph in enumerate(text.split("\n\n")):
+    raw = checker.getParagraphErrorsAsJSON(
+        index,
+        paragraph,
+        bContext=True,
+        bSpellSugg=True,
+        bReturnText=False,
+    )
+    data.append(json.loads(raw) if raw else {
+        "iParagraph": index,
+        "lGrammarErrors": [],
+        "lSpellingErrors": [],
+    })
+
+sys.stdout.write(json.dumps({"data": data}, ensure_ascii=False))
+"#;
 
 fn hidden_command(program: &str) -> Command {
     #[cfg(windows)]
@@ -71,28 +118,39 @@ fn grammalecte_commands() -> Vec<GrammalecteCommand> {
     let mut commands = vec![GrammalecteCommand {
         program: "grammalecte-cli".to_string(),
         prefix_args: vec![],
+        mode: GrammalecteCommandMode::LegacyCli,
     }];
 
-    if let Ok(path) = std::env::var("GRAMMALECTE_CLI") {
+    for env_key in ["GRAMMALECTE_CLI", "GRAMMALECTE_PATH"] {
+        let Ok(path) = std::env::var(env_key) else {
+            continue;
+        };
         let trimmed = path.trim();
         if !trimmed.is_empty() {
-            if trimmed.ends_with(".py") {
+            let candidate = PathBuf::from(trimmed);
+            if is_legacy_cli_file(&candidate) {
                 commands.push(GrammalecteCommand {
                     program: "python".to_string(),
                     prefix_args: vec![trimmed.to_string()],
+                    mode: GrammalecteCommandMode::LegacyCli,
                 });
                 commands.push(GrammalecteCommand {
                     program: "py".to_string(),
                     prefix_args: vec!["-3".to_string(), trimmed.to_string()],
+                    mode: GrammalecteCommandMode::LegacyCli,
                 });
                 commands.push(GrammalecteCommand {
                     program: "python3".to_string(),
                     prefix_args: vec![trimmed.to_string()],
+                    mode: GrammalecteCommandMode::LegacyCli,
                 });
+            } else if let Some(root) = resolve_grammalecte_package_root(&candidate) {
+                append_python_package_commands(&mut commands, root);
             } else {
                 commands.push(GrammalecteCommand {
                     program: trimmed.to_string(),
                     prefix_args: vec![],
+                    mode: GrammalecteCommandMode::LegacyCli,
                 });
             }
         }
@@ -103,18 +161,79 @@ fn grammalecte_commands() -> Vec<GrammalecteCommand> {
         commands.push(GrammalecteCommand {
             program: "python".to_string(),
             prefix_args: vec![value.clone()],
+            mode: GrammalecteCommandMode::LegacyCli,
         });
         commands.push(GrammalecteCommand {
             program: "py".to_string(),
             prefix_args: vec!["-3".to_string(), value.clone()],
+            mode: GrammalecteCommandMode::LegacyCli,
         });
         commands.push(GrammalecteCommand {
             program: "python3".to_string(),
             prefix_args: vec![value],
+            mode: GrammalecteCommandMode::LegacyCli,
         });
     }
 
+    for root in grammalecte_package_candidates() {
+        append_python_package_commands(&mut commands, root);
+    }
+
     commands
+}
+
+fn is_legacy_cli_file(path: &Path) -> bool {
+    path.is_file()
+        && path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .is_some_and(|name| name.eq_ignore_ascii_case("grammalecte-cli.py"))
+}
+
+fn is_grammalecte_package_root(path: &Path) -> bool {
+    path.join("grammar_checker.py").is_file()
+        && path.join("__init__.py").is_file()
+        && path.join("fr").join("gc_engine.py").is_file()
+}
+
+fn resolve_grammalecte_package_root(path: &Path) -> Option<PathBuf> {
+    if path.is_dir() && is_grammalecte_package_root(path) {
+        return Some(path.to_path_buf());
+    }
+    if path.is_file()
+        && path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .is_some_and(|name| name.eq_ignore_ascii_case("grammar_checker.py"))
+    {
+        let parent = path.parent()?;
+        if is_grammalecte_package_root(parent) {
+            return Some(parent.to_path_buf());
+        }
+    }
+    None
+}
+
+fn append_python_package_commands(commands: &mut Vec<GrammalecteCommand>, package_root: PathBuf) {
+    commands.push(GrammalecteCommand {
+        program: "python".to_string(),
+        prefix_args: vec!["-c".to_string()],
+        mode: GrammalecteCommandMode::PythonPackage {
+            package_root: package_root.clone(),
+        },
+    });
+    commands.push(GrammalecteCommand {
+        program: "py".to_string(),
+        prefix_args: vec!["-3".to_string(), "-c".to_string()],
+        mode: GrammalecteCommandMode::PythonPackage {
+            package_root: package_root.clone(),
+        },
+    });
+    commands.push(GrammalecteCommand {
+        program: "python3".to_string(),
+        prefix_args: vec!["-c".to_string()],
+        mode: GrammalecteCommandMode::PythonPackage { package_root },
+    });
 }
 
 fn find_file_named(root: &Path, filename: &str, depth: usize) -> Option<PathBuf> {
@@ -167,9 +286,60 @@ fn grammalecte_cli_candidates() -> Vec<PathBuf> {
     candidates
 }
 
+fn grammalecte_package_candidates() -> Vec<PathBuf> {
+    let mut candidates: Vec<PathBuf> = Vec::new();
+
+    #[cfg(windows)]
+    {
+        for env_key in ["ProgramFiles", "ProgramFiles(x86)", "LOCALAPPDATA", "APPDATA"] {
+            if let Ok(root) = std::env::var(env_key) {
+                for path in [
+                    PathBuf::from(&root).join("grammalecte"),
+                    PathBuf::from(&root).join("Grammalecte"),
+                    PathBuf::from(&root).join("Accessible").join("Grammalecte"),
+                ] {
+                    if is_grammalecte_package_root(&path) {
+                        candidates.push(path);
+                    } else if let Some(found) = find_file_named(&path, "grammar_checker.py", 6) {
+                        if let Some(root) = resolve_grammalecte_package_root(&found) {
+                            candidates.push(root);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[cfg(not(windows))]
+    {
+        if let Ok(home) = std::env::var("HOME") {
+            for path in [
+                PathBuf::from(&home).join(".local").join("share").join("grammalecte"),
+                PathBuf::from(&home).join(".accessible").join("grammalecte"),
+            ] {
+                if is_grammalecte_package_root(&path) {
+                    candidates.push(path);
+                }
+            }
+        }
+    }
+
+    candidates
+}
+
 fn command_help_works(command: &GrammalecteCommand) -> bool {
     let mut process = hidden_command(&command.program);
-    process.args(&command.prefix_args).arg("-h");
+    process.args(&command.prefix_args);
+    match &command.mode {
+        GrammalecteCommandMode::LegacyCli => {
+            process.arg("-h");
+        }
+        GrammalecteCommandMode::PythonPackage { package_root } => {
+            process
+                .arg(GRAMMALECTE_PROBE_SCRIPT)
+                .arg(package_root.to_string_lossy().to_string());
+        }
+    }
     process
         .output()
         .map(|output| output.status.success())
@@ -257,14 +427,18 @@ fn run_grammalecte_with_command(
 ) -> Result<String, String> {
     let mut process = hidden_command(&command.program);
     process.args(&command.prefix_args);
-    process
-        .arg("-f")
-        .arg(input_path)
-        .arg("-j")
-        .arg("-wss")
-        .arg("-ctx")
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
+    match &command.mode {
+        GrammalecteCommandMode::LegacyCli => {
+            process.arg("-f").arg(input_path).arg("-j").arg("-wss").arg("-ctx");
+        }
+        GrammalecteCommandMode::PythonPackage { package_root } => {
+            process
+                .arg(GRAMMALECTE_BRIDGE_SCRIPT)
+                .arg(package_root.to_string_lossy().to_string())
+                .arg(input_path);
+        }
+    }
+    process.stdout(Stdio::piped()).stderr(Stdio::piped());
 
     let output = process
         .spawn()
@@ -338,7 +512,7 @@ pub fn grammar_check_text(text: String) -> Result<Vec<SpellingIssueDto>, String>
 
     if !is_grammalecte_installed() {
         return Err(
-            "Grammalecte n'est pas installé. Installez Grammalecte (CLI) ou définissez la variable GRAMMALECTE_CLI vers grammalecte-cli.py, puis relancez.".to_string(),
+            "Grammalecte n'est pas installé. Installez Grammalecte CLI/Serveur, ou définissez GRAMMALECTE_CLI vers grammar_checker.py ou le dossier Grammalecte, puis relancez.".to_string(),
         );
     }
 

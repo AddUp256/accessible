@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Voice Alignment : s?lection, repli et chargement des textes bilingues. */
 import { isPriorityLanguage, type PriorityLanguageCode } from './priority-languages';
 
 /** Codes passés à la dictée Windows / Web Speech (hors français = langue secondaire bilingue). */

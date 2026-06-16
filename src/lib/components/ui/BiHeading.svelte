@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de interface partag?e : encapsule l?affichage et les interactions r?utilisables.
+
 	import type { UiKey } from '$lib/i18n';
 	import BiText from './BiText.svelte';
 

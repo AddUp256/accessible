@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de s?curit? locale : encapsule l?affichage et les interactions r?utilisables.
+
 
 	import { profileStore, settings } from '$lib/stores/profile';
 	import { unlockWithPassword } from '$lib/services/storage/encryption';

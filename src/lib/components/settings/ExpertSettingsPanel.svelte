@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de param?tres : encapsule l?affichage et les interactions r?utilisables.
+
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import { bilingualLabel, type UiKey } from '$lib/i18n';

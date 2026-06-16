@@ -1,3 +1,4 @@
+/** R?le : Extension Index : registre ou exemple de plugin int?gr?. */
 import { registerPlugin } from './registry';
 import { demoWordCountPlugin } from './examples/demo-word-count';
 

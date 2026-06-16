@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Page d?erreur SvelteKit accessible, affich?e quand une route ?choue.
+
 	import { page } from '$app/stores';
 	import BiHeading from '$lib/components/ui/BiHeading.svelte';
 	import BiText from '$lib/components/ui/BiText.svelte';

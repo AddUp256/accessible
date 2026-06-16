@@ -1,3 +1,4 @@
+/** R?le : Store Svelte Profile : centralise l??tat partag? et sa persistance. */
 import { browser } from '$app/environment';
 import { derived, get, writable } from 'svelte/store';
 import type { AccessibleProfile, AppSettings, DeepPartial } from '$lib/types/profile';

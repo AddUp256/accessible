@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de notes : fonctions pures ou r?gles locales testables hors interface. */
 import type { Note, NoteFormat, NotesData } from '$lib/types/profile';
 import { createId } from '$lib/modules/organizer/checklist';
 

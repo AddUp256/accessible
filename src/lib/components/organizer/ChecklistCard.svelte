@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de organisation : encapsule l?affichage et les interactions r?utilisables.
+
 	import BiText from '$lib/components/ui/BiText.svelte';
 	import {
 		addChecklistItem,

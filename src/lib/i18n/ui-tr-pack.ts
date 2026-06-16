@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Ui Tr Pack : s?lection, repli et chargement des textes bilingues. */
 import type { UiKey } from './ui-translations';
 
 /** Turkish explicit translations (bilingual interface — no English fallback). Mirror of UI_DE_PACK. */

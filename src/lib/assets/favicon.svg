@@ -1,3 +1,4 @@
+<!-- R?le : Favicon source c?t? biblioth?que ; v?rifier s?il doit remplacer ou suivre static/favicon.svg. -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Accessible">
   <rect width="32" height="32" rx="6" fill="#2d5a3d"/>
   <text x="16" y="22" text-anchor="middle" font-family="system-ui, Segoe UI, sans-serif" font-size="18" font-weight="700" fill="#ffffff">A</text>

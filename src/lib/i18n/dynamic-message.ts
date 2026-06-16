@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Dynamic Message : s?lection, repli et chargement des textes bilingues. */
 import { get } from 'svelte/store';
 
 import { settings } from '$lib/stores/profile';

@@ -1,10 +1,10 @@
 <script lang="ts">
+	// R?le : Composant Svelte de param?tres : encapsule l?affichage et les interactions r?utilisables.
+
 
 	import { profileStore, settings } from '$lib/stores/profile';
 
 	import {
-
-		INTERFACE_LANGUAGES,
 
 		OTHER_INTERFACE_LANGUAGES,
 
@@ -75,12 +75,14 @@
 
 
 	const priorityOptions = $derived(
-		PRIORITY_INTERFACE_LANGUAGES.filter((lang) => installedSet.has(lang.code))
+		PRIORITY_INTERFACE_LANGUAGES.filter((lang) => lang.code !== 'en' && installedSet.has(lang.code))
 	);
 
 
 
-	const otherOptions = $derived(OTHER_INTERFACE_LANGUAGES);
+	const otherOptions = $derived(
+		OTHER_INTERFACE_LANGUAGES.filter((lang) => lang.code !== 'en' && installedSet.has(lang.code))
+	);
 
 
 
@@ -104,7 +106,17 @@
 	);
 
 	onMount(() => {
-		void refreshLanguagePackRuntime();
+		void (async () => {
+			await refreshLanguagePackRuntime();
+			const selectedLanguage = $settings.ui.secondaryLanguage;
+			if (
+				selectedLanguage !== 'en' &&
+				!isPriorityLanguage(selectedLanguage) &&
+				!isLanguagePackInstalled(selectedLanguage)
+			) {
+				patchUi({ secondaryLanguage: 'en' });
+			}
+		})();
 	});
 </script>
 
@@ -181,7 +193,7 @@
 
 				{#if otherOptions.length > 0}
 
-					<optgroup label="Autres langues (aperçu partiel)">
+					<optgroup label="Autres langues installées (packs complets)">
 
 						{#each otherOptions as language (language.code)}
 
@@ -236,6 +248,11 @@
 		<p class="language-installed" aria-live="polite">
 			<BiText fr="Langues installées sur cet appareil :" key="settings.bilingual.installedLabel" />
 			{installedListLabel}
+		</p>
+
+		<p class="language-note">
+			Les langues hors prioritaires apparaîtront ici uniquement quand un pack complet aura été
+			installé.
 		</p>
 
 		<p class="language-note">

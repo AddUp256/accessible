@@ -1,3 +1,4 @@
+/** R?le : Logique m?tier de ?criture assist?e : fonctions pures ou r?gles locales testables hors interface. */
 import {
 	COMMON_FRENCH_WORDS,
 	NEXT_WORD_SUGGESTIONS,

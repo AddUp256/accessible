@@ -1,3 +1,4 @@
+/** R?le : Service de stockage local : isole les acc?s navigateur, Tauri ou fichiers locaux. */
 import {
 	DEFAULT_APP_SETTINGS,
 	DEFAULT_COMMUNICATOR_DATA,
@@ -32,7 +33,8 @@ export function createDefaultProfile(): AccessibleProfile {
 		onboarding: {
 			path: null,
 			completedSteps: [],
-			comparisons: []
+			comparisons: [],
+			diagnosticAnswers: []
 		},
 		activatedTools: [],
 		privacy: {

@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Teacher Journey : donn?es m?tier sans effet de bord. */
 /** Parcours guidé enseignant / accompagnant (Phase 42). */
 
 export interface TeacherJourneyStep {

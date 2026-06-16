@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de interface partag?e : encapsule l?affichage et les interactions r?utilisables.
+
 
 	import { onMount } from 'svelte';
 

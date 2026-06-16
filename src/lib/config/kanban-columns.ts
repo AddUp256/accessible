@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Kanban Columns : donn?es m?tier sans effet de bord. */
 /** Colonnes Kanban simples — FALC. */
 
 import type { KanbanColumnId } from '$lib/types/profile';

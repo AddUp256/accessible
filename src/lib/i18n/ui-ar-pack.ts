@@ -1,3 +1,4 @@
+/** R?le : Aide i18n Ui Ar Pack : s?lection, repli et chargement des textes bilingues. */
 import type { UiKey } from './ui-translations';
 
 /** ترجمات عربية صريحة (واجهة ثنائية اللغة — بلا رجوع للإنجليزية). مرآة لـ UI_DE_PACK / UI_ES_PACK. */

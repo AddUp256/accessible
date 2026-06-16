@@ -1,3 +1,4 @@
+/** R?le : Configuration d?clarative Crisis Cards : donn?es m?tier sans effet de bord. */
 /** Cartes de besoin — mode pause / crise (affichage FALC). */
 export interface CrisisCard {
 	id: string;

@@ -1,4 +1,6 @@
 <script lang="ts">
+	// R?le : Composant Svelte de lecture adapt?e : encapsule l?affichage et les interactions r?utilisables.
+
 
 	import FontCompareTable from '$lib/components/reading/FontCompareTable.svelte';
 
