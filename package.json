@@ -1,13 +1,40 @@
 {
-  "name": "accessible",
-  "private": true,
+  "name": "@addup256/accessible",
+  "private": false,
   "description": "Application locale pour adapter la lecture, l'ecriture, l'organisation, la communication et le travail numerique.",
   "version": "0.1.9",
   "license": "MIT",
+  "homepage": "https://addup256.github.io/accessible/",
+  "bugs": {
+    "url": "https://github.com/AddUp256/accessible/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AddUp256/accessible.git"
+    "url": "git+https://github.com/AddUp256/accessible.git"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
+  },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "PRIVACY.md",
+    "SECURITY.md",
+    "SUPPORT.md",
+    "COMPATIBILITY.md",
+    "INSTALLATION.md",
+    "BUILD.md",
+    "PROJECT_STATUS.md",
+    "AUDIT_CODEBASE.md",
+    "src",
+    "src-tauri",
+    "static",
+    "scripts",
+    "installer",
+    ".github/workflows"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite dev --host 127.0.0.1 --port 5173 --strictPort",

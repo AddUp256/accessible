@@ -1,6 +1,10 @@
 # Publication GitHub
 
-Ce guide prepare une publication publique avec artefacts Windows, macOS et Linux.
+Ce guide prepare une publication publique avec trois canaux distincts :
+
+- **GitHub Releases** : installateurs et archives utilisateur Windows, macOS et Linux.
+- **GitHub Pages** : version numerique statique consultable dans le navigateur.
+- **GitHub Packages** : package npm source `@addup256/accessible` pour archivage, audit et integration technique.
 
 ## 1. Initialiser le depot
 
@@ -75,7 +79,34 @@ Il est aussi possible de lancer le workflow manuellement :
 2. Run workflow.
 3. Entrer `v0.1.0`.
 
-## 5. Signature et notarisation
+## 5. Publier le package GitHub Packages
+
+Le package GitHub Packages ne remplace pas les installateurs. Il sert a rendre visible un paquet source versionne dans la section **Packages** du depot GitHub.
+
+Le workflow `.github/workflows/package.yml` publie `@addup256/accessible` sur `https://npm.pkg.github.com` quand `main` change et que la version de `package.json` n'existe pas encore.
+
+Pour lancer manuellement :
+
+1. GitHub -> Actions -> GitHub package.
+2. Run workflow.
+3. Branche : `main`.
+
+Pour installer le package dans un contexte technique autorise :
+
+```bash
+npm config set @addup256:registry https://npm.pkg.github.com
+npm install @addup256/accessible
+```
+
+Si la publication echoue avec une erreur de droits, verifier que le workflow possede bien :
+
+```yaml
+permissions:
+  contents: read
+  packages: write
+```
+
+## 6. Signature et notarisation
 
 ### Windows
 
@@ -98,7 +129,7 @@ Secrets typiques :
 
 Le `.deb` et l'AppImage ne sont pas signes par defaut. Une signature GPG des AppImage peut etre ajoutee quand une cle de publication existe.
 
-## 6. Compatibilites a annoncer
+## 7. Compatibilites a annoncer
 
 Copier la matrice de `COMPATIBILITY.md` dans la description de release. Ne pas promettre :
 
@@ -106,7 +137,7 @@ Copier la matrice de `COMPATIBILITY.md` dans la description de release. Ne pas p
 - Linux ARM tant qu'un runner ARM n'a pas ete teste.
 - macOS "sans avertissement" tant que la notarisation n'est pas activee.
 
-## 7. Checklist release
+## 8. Checklist release
 
 - [ ] `npm run smoke`
 - [ ] `npx tauri build --no-bundle --ci` sur Windows
