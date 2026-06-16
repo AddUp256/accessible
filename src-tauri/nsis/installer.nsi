@@ -174,6 +174,7 @@ VIAddVersionKey "ProductVersion" "${VERSION}"
 Page custom AccessibleLangModePage AccessibleLangModeLeave
 Page custom AccessibleLangSelectPage AccessibleLangSelectLeave
 Page custom AccessibleDesktopShortcutPage AccessibleDesktopShortcutLeave
+Page custom AccessibleOptionalToolsPage AccessibleOptionalToolsLeave
 
 ; 2. License Page (if defined)
 !if "${LICENSE}" != ""

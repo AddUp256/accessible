@@ -50,7 +50,7 @@
 				'winget install --id UB-Mannheim.TesseractOCR --exact --source winget --accept-package-agreements --accept-source-agreements',
 				'$roots = @($env:ProgramFiles + "\\Tesseract-OCR", ${env:ProgramFiles(x86)} + "\\Tesseract-OCR")',
 				'$root = $roots | Where-Object { Test-Path (Join-Path $_ "tesseract.exe") } | Select-Object -First 1',
-				'if (-not $root) { throw "Tesseract est installé mais tesseract.exe est introuvable. Relancez PowerShell puis réessayez." }',
+				'if (-not $root) { throw "Tesseract est installé mais tesseract.exe est introuvable. Fermez la session Windows ou redémarrez l ordinateur puis réessayez." }',
 				'$tessdata = Join-Path $root "tessdata"',
 				'New-Item -ItemType Directory -Force $tessdata | Out-Null',
 				'Invoke-WebRequest "https://raw.githubusercontent.com/tesseract-ocr/tessdata/main/fra.traineddata" -OutFile (Join-Path $tessdata "fra.traineddata")',
@@ -111,7 +111,7 @@
 				'checker = gc.GrammarChecker("fr")',
 				'print(checker.getParagraphErrorsAsJSON(0, "Je suis aller a la maison.", bContext=True, bSpellSugg=True))',
 				"'@ | Set-Content -Encoding UTF8 $probe",
-				'if ($py) { & py -3 $probe $root } else { Write-Host "Python est installé. Relancez PowerShell si py n est pas encore disponible." }',
+				'if ($py) { & py -3 $probe $root } else { Write-Host "Python est installé. Redémarrez Windows si py n est pas encore disponible." }',
 				'Write-Host "Grammalecte est déclaré. Fermez puis relancez Accessible."'
 			].join('\n')
 		},
@@ -355,10 +355,9 @@
 	<details class="optional-tools" aria-labelledby="optional-tools-heading" open>
 		<summary id="optional-tools-heading">Modules optionnels sous Windows</summary>
 		<p class="installation-hint">
-			Ouvrir PowerShell, copier chaque commande, accepter les confirmations Windows, puis redémarrer
-			Accessible. Les commandes ci-dessous installent ou configurent les modules les plus utiles :
-			OCR français, correction orthographique, correction grammaticale, transcription locale et voix
-			locale. Elles utilisent les sources officielles quand le module dépend d’un fichier externe.
+			L’installateur Windows propose une page de personnalisation pour installer ces modules sans
+			commande manuelle. Les blocs ci-dessous restent une documentation de secours pour un service
+			informatique si winget, Internet ou les téléchargements externes sont bloqués sur le poste.
 		</p>
 		<ul class="source-links" aria-label="Sources des modules optionnels">
 			<li><a href="https://github.com/tesseract-ocr/tessdata" target="_blank" rel="noreferrer">Tesseract tessdata</a></li>

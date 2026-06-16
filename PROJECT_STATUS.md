@@ -1,10 +1,10 @@
 # PROJECT_STATUS — Accessible
 
-**Dernière mise à jour :** 2026-06-02  
-**Phase actuelle :** 51 — Packs installateur + voix bilingues ✅  
-**Phase précédente :** 50 — Déverrouillage + ReadAloud i18n ✅  
+**Dernière mise à jour :** 2026-06-16  
+**Phase actuelle :** 52 — Installateur Windows avec modules optionnels ✅  
+**Phase précédente :** 51 — Packs installateur + voix bilingues ✅  
 
-**Prochaine tâche :** smoke tests manuels TEST_PLAN (installateur NSIS + parcours bilingue)
+**Prochaine tâche :** smoke tests manuels TEST_PLAN (installateur NSIS + modules optionnels)
 
 ---
 
@@ -21,7 +21,7 @@
 | Dossier données | `%APPDATA%/Accessible/` + mode portable `./data/` |
 | TTS | Web Speech API + Piper TTS (Tauri, `PIPER_MODEL`) |
 | PDF | jsPDF côté frontend |
-| Moteurs externes | Tesseract, Hunspell, Grammalecte, Piper = binaires/modèles **non embarqués** ; stubs propres si absents |
+| Moteurs externes | Installables/configurables depuis l’installateur NSIS Windows quand Internet et les sources officielles sont disponibles ; stubs propres si absents |
 
 ---
 

@@ -39,12 +39,14 @@ npm run build:lang-packs
 
 Génère `static/lang-packs/`, `installer/lang-packs/` et `src-tauri/resources/lang-packs/`.
 
-Pour une distribution Windows complète, regroupez l’installateur Tauri + `installer/Accessible-Setup.ps1` + `installer/lang-packs/` (voir [installer/README.md](./installer/README.md)).
+Pour une distribution Windows complète, publiez en priorité l’installateur Tauri NSIS. Il intègre les packs de langue et la personnalisation des modules complémentaires installables sans passage manuel par PowerShell.
 
 L’installateur NSIS personnalisé (`src-tauri/nsis/installer.nsi`) propose après l’accueil :
 
 - **Installation complète** ou **packs de langue uniquement**
 - Cases à cocher pour les 9 langues prioritaires
+- Raccourci de bureau
+- Modules complémentaires Windows : Tesseract, Hunspell, Grammalecte, FFmpeg/whisper.cpp, Piper et eSpeak NG
 
 Configuration : `tauri.conf.json` → `bundle.windows.nsis`.
 

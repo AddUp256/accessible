@@ -56,29 +56,20 @@ Les premières versions peuvent ne pas être signées. Windows SmartScreen ou ma
 
 ## Dépendances optionnelles Windows
 
-Depuis le dossier du projet, un script installe automatiquement les moteurs les plus courants avec Winget :
+Avec l’installateur Windows `.exe` (NSIS), une page `Modules complémentaires Windows` permet de choisir les moteurs à installer ou configurer sans ouvrir PowerShell. L’assistant utilise `winget`, les sources officielles et des téléchargements directs en arrière-plan. Si un module échoue, Accessible reste installé et le détail apparaît dans le journal de l’assistant.
 
-```powershell
-powershell -NoProfile -File .\scripts\install-windows-optional-tools.ps1
-```
-
-Le script tente d’installer :
+Les modules proposés sont :
 
 | Moteur | Rôle |
 | --- | --- |
-| Tesseract OCR | Reconnaissance de texte dans les images et PDF |
-| FFmpeg | Traitement audio/vidéo |
+| Tesseract OCR + `fra.traineddata` | Reconnaissance de texte dans les images et PDF |
+| Hunspell + dictionnaire `fr_FR` | Correction orthographique |
+| Python + Grammalecte | Correction grammaticale française |
+| FFmpeg + whisper.cpp + modèle base | Transcription locale |
+| Piper + voix française | Synthèse vocale locale de meilleure qualité |
 | eSpeak NG | Synthèse vocale locale légère |
 
-Après installation, redémarrer Accessible. Si un moteur n’est pas détecté, redémarrer Windows ou vérifier que son dossier est dans le `PATH`.
-
-Si PowerShell bloque l’exécution du script, lancer les installations une par une depuis PowerShell :
-
-```powershell
-winget install --id UB-Mannheim.TesseractOCR --exact --source winget
-winget install --id Gyan.FFmpeg --exact --source winget
-winget install --id eSpeak-NG.eSpeak-NG --exact --source winget
-```
+Pour un déploiement administré, les commandes documentées dans `Paramètres > Installation et dépendances` peuvent servir de référence technique, mais elles ne sont plus le parcours normal d’installation.
 
 ## Dépendances optionnelles macOS et Linux
 

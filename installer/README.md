@@ -2,20 +2,13 @@
 
 ## Contenu du dossier de distribution
 
-Après `npm run tauri:build` et `npm run build:lang-packs`, préparez un ZIP ou un média USB avec :
+Après `npm run tauri:build` et `npm run build:lang-packs`, publiez en priorité l’installateur Tauri NSIS :
 
 ```
-Accessible-Setup.ps1          ← ce script
-lang-packs/
-  catalog.json
-  es.json
-  ar.json
-  zh.json
-  …
 Accessible_0.0.1_x64-setup.exe   ← installateur Tauri (NSIS ou MSI)
 ```
 
-L’application **de base** (exe + WebView) est installée par le setup Tauri. Les **traductions bilingues** sont des fichiers JSON copiés dans `{Installation}\lang-packs\`.
+L’application **de base** (exe + WebView), les **traductions bilingues** et la personnalisation des **modules complémentaires Windows** sont gérées par le setup Tauri NSIS.
 
 ## Première installation (installateur NSIS intégré — recommandé)
 
@@ -23,10 +16,14 @@ L’installateur Windows généré par `npm run tauri:build` (ou `npm run tauri:
 
 1. **Type d’installation** : complète ou **packs de langue uniquement** (libellés FR/EN — sélecteur de langue NSIS au démarrage si activé)
 2. **Langues à installer** : cases à cocher (es, ar, zh, it, pt, de, hi, uk, tr)
+3. **Raccourci de bureau**
+4. **Modules complémentaires Windows** : Tesseract, Hunspell, Grammalecte, FFmpeg/whisper.cpp, Piper et eSpeak NG
 
 Seuls les packs cochés sont conservés dans `{Installation}\lang-packs\`.
 
-## Alternative : script PowerShell
+## Ancien recours : script PowerShell
+
+Le script `Accessible-Setup.ps1` reste uniquement un recours de maintenance pour les anciens médias d’installation ou les tests internes. Le parcours utilisateur recommandé ne passe plus par PowerShell.
 
 1. Clic droit sur `Accessible-Setup.ps1` → **Exécuter avec PowerShell**.
 2. Choisir **1 — Installation complète** ou **2 — Packs de langue uniquement**.

@@ -2,7 +2,7 @@
   "name": "@addup256/accessible",
   "private": false,
   "description": "Application locale pour adapter la lecture, l'ecriture, l'organisation, la communication et le travail numerique.",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "license": "MIT",
   "homepage": "https://addup256.github.io/accessible/",
   "bugs": {

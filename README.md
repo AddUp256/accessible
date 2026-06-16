@@ -91,6 +91,8 @@ Les installateurs et archives sont publiés dans GitHub Releases :
 
 Les premiers installateurs peuvent afficher des avertissements Windows SmartScreen ou macOS Gatekeeper tant que la signature de code et la notarisation ne sont pas mises en place.
 
+Sur Windows, l’installateur NSIS propose une personnalisation des modules complémentaires : Tesseract, Hunspell, Grammalecte, FFmpeg/whisper.cpp, Piper et eSpeak NG peuvent être installés ou configurés depuis l’assistant, sans commande manuelle.
+
 ### GitHub Packages
 
 Le dépôt publie aussi un package npm GitHub Packages à partir de `main`. Ce package sert de paquet source versionné pour audit, archivage et intégration technique. Il ne remplace pas les installateurs utilisateur, qui restent dans GitHub Releases.
@@ -201,6 +203,8 @@ Accessible fonctionne sans moteurs externes. Les modules ci-dessous améliorent 
 | whisper.cpp | Transcription locale |
 | Piper | Voix locale de meilleure qualité |
 | eSpeak NG | Voix locale légère |
+
+Sous Windows, l’installateur `.exe` propose ces modules comme options d’installation. Les commandes visibles dans `Paramètres > Installation et dépendances` servent surtout de référence technique pour les postes gérés ou les dépannages.
 
 Voir [EXTERNAL_DEPENDENCIES.md](./EXTERNAL_DEPENDENCIES.md) et [ENGINE_SETUP.md](./ENGINE_SETUP.md).
 

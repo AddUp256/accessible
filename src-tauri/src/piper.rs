@@ -26,17 +26,98 @@ pub struct PiperSynthDto {
 
 static WORK_COUNTER: AtomicU64 = AtomicU64::new(0);
 
-fn piper_command() -> Command {
+#[cfg(windows)]
+fn hidden_path_command(path: &Path) -> Command {
+    let mut command = Command::new(path);
+    command.creation_flags(0x08000000);
+    command
+}
+
+#[cfg(not(windows))]
+fn hidden_path_command(path: &Path) -> Command {
+    Command::new(path)
+}
+
+fn hidden_command(program: &str) -> Command {
     #[cfg(windows)]
     {
-        let mut command = Command::new("piper");
+        let mut command = Command::new(program);
         command.creation_flags(0x08000000);
         command
     }
     #[cfg(not(windows))]
     {
-        Command::new("piper")
+        Command::new(program)
     }
+}
+
+fn find_file_named(root: &Path, filename: &str, depth: usize) -> Option<PathBuf> {
+    if depth == 0 || !root.is_dir() {
+        return None;
+    }
+
+    let entries = fs::read_dir(root).ok()?;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_file()
+            && path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(|name| name.eq_ignore_ascii_case(filename))
+        {
+            return Some(path);
+        }
+        if path.is_dir() {
+            if let Some(found) = find_file_named(&path, filename, depth - 1) {
+                return Some(found);
+            }
+        }
+    }
+
+    None
+}
+
+fn piper_binary_candidates() -> Vec<PathBuf> {
+    let mut candidates = Vec::new();
+
+    if let Ok(path) = std::env::var("PIPER_CMD") {
+        if !path.trim().is_empty() {
+            candidates.push(PathBuf::from(path.trim()));
+        }
+    }
+
+    #[cfg(windows)]
+    {
+        if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
+            let local_root = PathBuf::from(&local_app_data).join("Accessible").join("Piper");
+            candidates.push(local_root.join("piper").join("piper.exe"));
+            candidates.push(local_root.join("piper.exe"));
+            if let Some(found) = find_file_named(&local_root, "piper.exe", 4) {
+                candidates.push(found);
+            }
+            candidates.push(
+                PathBuf::from(&local_app_data)
+                    .join("Programs")
+                    .join("Piper")
+                    .join("piper.exe"),
+            );
+        }
+
+        for env_key in ["ProgramFiles", "ProgramFiles(x86)"] {
+            if let Ok(root) = std::env::var(env_key) {
+                candidates.push(PathBuf::from(&root).join("Piper").join("piper.exe"));
+            }
+        }
+    }
+
+    candidates
+}
+
+fn piper_command() -> Command {
+    if let Some(path) = piper_binary_candidates().into_iter().find(|path| path.is_file()) {
+        return hidden_path_command(&path);
+    }
+    hidden_command("piper")
 }
 
 pub fn is_piper_installed() -> bool {
@@ -47,25 +128,56 @@ pub fn is_piper_installed() -> bool {
         .unwrap_or(false)
 }
 
-fn resolve_piper_model(model_path: Option<&str>) -> Result<PathBuf, String> {
-    let path = if let Some(custom) = model_path.filter(|p| !p.trim().is_empty()) {
-        custom.to_string()
-    } else {
-        std::env::var("PIPER_MODEL").map_err(|_| {
-            "Variable PIPER_MODEL non définie. Indiquez le chemin vers une voix Piper .onnx (français)."
-                .to_string()
-        })?
-    };
+fn default_piper_model() -> Option<PathBuf> {
+    #[cfg(windows)]
+    {
+        let local_app_data = std::env::var("LOCALAPPDATA").ok()?;
+        let voices = PathBuf::from(local_app_data)
+            .join("Accessible")
+            .join("Piper")
+            .join("voices");
+        for name in [
+            "fr_FR-siwis-medium.onnx",
+            "fr_FR-upmc-medium.onnx",
+            "fr_FR-gilles-low.onnx",
+        ] {
+            let path = voices.join(name);
+            if path.is_file() {
+                return Some(path);
+            }
+        }
+    }
 
-    let model_path = PathBuf::from(path.trim());
-    if !model_path.is_file() {
+    None
+}
+
+fn resolve_piper_model(model_path: Option<&str>) -> Result<PathBuf, String> {
+    if let Some(custom) = model_path.filter(|p| !p.trim().is_empty()) {
+        let model_path = PathBuf::from(custom.trim());
+        if model_path.is_file() {
+            return Ok(model_path);
+        }
         return Err(format!(
             "Modèle Piper introuvable : {}",
             model_path.to_string_lossy()
         ));
     }
 
-    Ok(model_path)
+    if let Ok(path) = std::env::var("PIPER_MODEL") {
+        let model_path = PathBuf::from(path.trim());
+        if model_path.is_file() {
+            return Ok(model_path);
+        }
+    }
+
+    if let Some(model_path) = default_piper_model() {
+        return Ok(model_path);
+    }
+
+    Err(
+        "Variable PIPER_MODEL non définie. Indiquez le chemin vers une voix Piper .onnx (français)."
+            .to_string(),
+    )
 }
 
 #[derive(Serialize)]
@@ -113,6 +225,18 @@ pub fn list_piper_voices() -> Vec<PiperVoiceDto> {
     .flatten()
     {
         voices.push(voice);
+    }
+    if let Some(path) = default_piper_model() {
+        let value = path.to_string_lossy().to_string();
+        if !voices.iter().any(|voice| voice.path == value) {
+            voices.push(PiperVoiceDto {
+                id: "fr-local".to_string(),
+                label: "Français (Piper installé)".to_string(),
+                lang: "fr".to_string(),
+                path: value,
+                available: true,
+            });
+        }
     }
     voices
 }

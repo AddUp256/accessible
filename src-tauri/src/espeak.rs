@@ -26,47 +26,95 @@ pub struct EspeakSynthDto {
 
 static WORK_COUNTER: AtomicU64 = AtomicU64::new(0);
 
-fn espeak_command_name() -> Option<&'static str> {
-    for name in ["espeak-ng", "espeak"] {
-        let ok = {
-            #[cfg(windows)]
-            let mut command = Command::new(name);
-            #[cfg(windows)]
-            command.creation_flags(0x08000000);
-            #[cfg(not(windows))]
-            let mut command = Command::new(name);
-            command
-                .arg("--version")
-                .output()
-                .map(|output| output.status.success())
-                .unwrap_or(false)
-        };
-        if ok {
-            return Some(name);
-        }
-    }
-    None
+#[cfg(windows)]
+fn hidden_path_command(path: &Path) -> Command {
+    let mut command = Command::new(path);
+    command.creation_flags(0x08000000);
+    command
 }
 
-fn espeak_command() -> Result<Command, String> {
-    let name = espeak_command_name().ok_or_else(|| {
-        "eSpeak NG n'est pas installé ou introuvable. Installez espeak-ng et ajoutez-le au PATH."
-            .to_string()
-    })?;
+#[cfg(not(windows))]
+fn hidden_path_command(path: &Path) -> Command {
+    Command::new(path)
+}
+
+fn hidden_command(program: &str) -> Command {
     #[cfg(windows)]
     {
-        let mut command = Command::new(name);
+        let mut command = Command::new(program);
         command.creation_flags(0x08000000);
-        Ok(command)
+        command
     }
     #[cfg(not(windows))]
     {
-        Ok(Command::new(name))
+        Command::new(program)
     }
 }
 
+fn command_works(mut command: Command) -> bool {
+    command
+        .arg("--version")
+        .output()
+        .map(|output| output.status.success())
+        .unwrap_or(false)
+}
+
+fn espeak_binary_candidates() -> Vec<PathBuf> {
+    let mut candidates = Vec::new();
+
+    if let Ok(path) = std::env::var("ESPEAK_CMD") {
+        if !path.trim().is_empty() {
+            candidates.push(PathBuf::from(path.trim()));
+        }
+    }
+
+    #[cfg(windows)]
+    {
+        if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
+            candidates.push(
+                PathBuf::from(&local_app_data)
+                    .join("Programs")
+                    .join("eSpeak NG")
+                    .join("espeak-ng.exe"),
+            );
+        }
+
+        for env_key in ["ProgramFiles", "ProgramFiles(x86)"] {
+            if let Ok(root) = std::env::var(env_key) {
+                candidates.push(
+                    PathBuf::from(&root)
+                        .join("eSpeak NG")
+                        .join("espeak-ng.exe"),
+                );
+                candidates.push(PathBuf::from(&root).join("eSpeak").join("espeak.exe"));
+            }
+        }
+    }
+
+    candidates
+}
+
+fn espeak_command() -> Result<Command, String> {
+    for path in espeak_binary_candidates() {
+        if path.is_file() && command_works(hidden_path_command(&path)) {
+            return Ok(hidden_path_command(&path));
+        }
+    }
+
+    for name in ["espeak-ng", "espeak"] {
+        if command_works(hidden_command(name)) {
+            return Ok(hidden_command(name));
+        }
+    }
+
+    Err(
+        "eSpeak NG n'est pas installé ou introuvable. Installez espeak-ng et ajoutez-le au PATH."
+            .to_string(),
+    )
+}
+
 pub fn is_espeak_installed() -> bool {
-    espeak_command_name().is_some()
+    espeak_command().is_ok()
 }
 
 fn resolve_espeak_voice() -> String {
